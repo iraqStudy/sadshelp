@@ -51,21 +51,32 @@ const db = getFirestore(app);
         adsContainer.addEventListener('mouseleave', () => slideInterval = setInterval(nextSlide, 4000));
     }
 
-    // --- نظام أساتذة الفرع العلمي (متزامن مع Firebase Firestore) ---
+    // --- بيانات الأساتذة (العربية والرياضيات) ---
     let arabicTeachers = [
         { id: 'aqeel', name: 'الأستاذ عقيل الزبيدي', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/PkVYe5d.jpeg' },
         { id: 'hussein', name: 'الأستاذ حسين عبيده', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/NGwjU7p.jpeg' },
         { id: 'hamza', name: 'الأستاذ حمزه الجابري', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/P7cah0U.jpeg' }
     ];
 
+    let mathTeachers = [
+        { id: 'haidar_abdulaima', name: 'الأستاذ حيدر عبدالائمه', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/uJ3L9fg.jpeg' },
+        { id: 'haidar_waleed', name: 'الأستاذ حيدر وليد', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/HlvmR5C.jpeg' },
+        { id: 'mohammed_qasim', name: 'الأستاذ محمد قاسم', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/kcRf1Vu.jpeg' }
+    ];
+
     function loadLocalVotesState() {
         arabicTeachers.forEach(teacher => {
+            teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
+        });
+        mathTeachers.forEach(teacher => {
             teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
         });
     }
 
     function initFirebaseListeners() {
         loadLocalVotesState();
+        
+        // استماع لبيانات أساتذة العربي
         arabicTeachers.forEach(teacher => {
             onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
                 if (docSnap.exists()) {
@@ -81,8 +92,26 @@ const db = getFirestore(app);
                 console.error("خطأ في مزامنة بيانات المدرس:", error);
             });
         });
+
+        // استماع لبيانات أساتذة الرياضيات
+        mathTeachers.forEach(teacher => {
+            onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (typeof data.votes === 'number') {
+                        teacher.likes = data.votes;
+                    }
+                } else {
+                    setDoc(doc(db, "teachers", teacher.id), { votes: 0 }).catch(console.error);
+                }
+                renderMathTeachers();
+            }, (error) => {
+                console.error("خطأ في مزامنة بيانات مدرس الرياضيات:", error);
+            });
+        });
     }
 
+    // دالة رسم وتحديث أساتذة اللغة العربية مع التحريك السلس
     function renderArabicTeachers() {
         const container = document.getElementById('arabicTeachersList');
         if(!container) return;
@@ -95,8 +124,12 @@ const db = getFirestore(app);
             }
         });
 
+        // تحديث حالة التصويت محلياً لكل عنصر بناءً على الذاكرة
+        arabicTeachers.forEach(t => {
+            t.userVote = localStorage.getItem('voted_' + t.id) === 'true';
+        });
+
         arabicTeachers.sort((a, b) => b.likes - a.likes);
-        
         container.innerHTML = '';
         
         arabicTeachers.forEach((teacher, index) => {
@@ -155,8 +188,85 @@ const db = getFirestore(app);
         });
     }
 
+    // دالة رسم وتحديث أساتذة الرياضيات مع التحريك السلس
+    function renderMathTeachers() {
+        const container = document.getElementById('mathTeachersList');
+        if(!container) return;
+
+        const cardPositions = {};
+        container.querySelectorAll('.teacher-card-item').forEach(card => {
+            const id = card.getAttribute('data-id');
+            if (id) {
+                cardPositions[id] = card.getBoundingClientRect();
+            }
+        });
+
+        mathTeachers.forEach(t => {
+            t.userVote = localStorage.getItem('voted_' + t.id) === 'true';
+        });
+
+        mathTeachers.sort((a, b) => b.likes - a.likes);
+        container.innerHTML = '';
+        
+        mathTeachers.forEach((teacher, index) => {
+            let rankText = `المرتبة #${index + 1}`;
+            let rankClass = 'rank-third';
+            
+            if(index === 0) {
+                rankText = `👑 الأول على المادة`;
+                rankClass = 'rank-first';
+            } else if(index === 1) {
+                rankText = `⭐ المرتبة #2`;
+                rankClass = 'rank-second';
+            } else if(index === 2) {
+                rankText = `🥉 المرتبة #3`;
+                rankClass = 'rank-third';
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'teacher-card-item';
+            card.setAttribute('data-id', teacher.id);
+            card.innerHTML = `
+                <div class="teacher-info-side">
+                    <div class="teacher-rank-badge ${rankClass}">${rankText}</div>
+                    <div class="teacher-main-title">${teacher.name}</div>
+                    <div class="teacher-meta-list" style="margin-top: 6px;">
+                        <div class="teacher-meta-row"><span>المادة:</span> <strong>${teacher.subject}</strong></div>
+                        <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
+                    </div>
+                    <div class="voting-actions-row" style="margin-top: 10px;">
+                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" onclick="voteTeacher('${teacher.id}')">
+                            👍 لايك <span class="vote-count">(${teacher.likes})</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="teacher-avatar-side">
+                    <img src="${teacher.img}" alt="${teacher.name}" class="teacher-avatar-img">
+                </div>
+            `;
+            container.appendChild(card);
+
+            const oldPos = cardPositions[teacher.id];
+            if (oldPos) {
+                const newPos = card.getBoundingClientRect();
+                const deltaY = oldPos.top - newPos.top;
+                
+                if (deltaY !== 0) {
+                    card.style.transform = `translateY(${deltaY}px)`;
+                    card.style.transition = 'none';
+                    
+                    requestAnimationFrame(() => {
+                        card.style.transform = '';
+                        card.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                    });
+                }
+            }
+        });
+    }
+
+    // دالة التصويت العامة (تدعم الزيادة والنقصان والتفاعل الفوري)
     window.voteTeacher = async function(teacherId) {
-        const targetTeacher = arabicTeachers.find(t => t.id === teacherId);
+        const targetTeacher = arabicTeachers.find(t => t.id === teacherId) || mathTeachers.find(t => t.id === teacherId);
         if (!targetTeacher) return;
 
         const hasVoted = localStorage.getItem('voted_' + teacherId) === 'true';
@@ -176,12 +286,16 @@ const db = getFirestore(app);
                 localStorage.setItem('voted_' + teacherId, 'true');
                 targetTeacher.userVote = true;
             }
+            // إعادة التحديث الفوري للواجهات
+            renderArabicTeachers();
+            renderMathTeachers();
         } catch (error) {
             console.error("خطأ في تحديث التصويت السحابي:", error);
             alert("فشل تحديث الصوت، تحقق من الاتصال بالإنترنت.");
         }
     };
 
+    // --- الفلاتر وتصفية العناصر ---
     window.filterItems = function(sectionType, subjectName) {
         let containerId = '';
         if(sectionType === 'books') containerId = 'booksListContainer';
@@ -214,6 +328,7 @@ const db = getFirestore(app);
         initFirebaseListeners();
     });
 
+    // --- إدارة التنقل بين الصفحات ---
     let pageHistory = ['home'];
     
     window.showPage = function(id, parentId=null) {
@@ -254,6 +369,7 @@ const db = getFirestore(app);
         }
     };
 
+    // --- قوائم التنقل الجانبية والعائمة ---
     window.toggleMenu = function() {
         const overlay = document.getElementById('navOverlay');
         const floatingContainer = document.getElementById('floatingContainer');
@@ -393,4 +509,4 @@ const db = getFirestore(app);
         if(e.key === 'Enter') window.sendAIMessage();
     };
 
-})();
+})();ح٨٧٦
