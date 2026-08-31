@@ -27,6 +27,8 @@
 .search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 .search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
 .search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
+.page-view { display: none; }
+.page-view.active { display: block; }
 </style>
 </head>
 <body>
@@ -866,186 +868,99 @@ function updateBiologyVoteUI() {
     sortTeacherContainer('#teacher-biology .books-list-container');
 }
 
-window.addEventListener('DOMContentLoaded', () => { 
-    updateArabicVoteUI(); 
-    updateIslamicVoteUI();
-    updateMathVoteUI();
-    updateEnglishVoteUI();
-    updatePhysicsVoteUI();
-    updateBiologyVoteUI();
-    updateChemistryVoteUI();
-});
-function openExamModal() { document.getElementById('examOptionsModal').style.display = 'flex'; }
-function closeExamModal() { document.getElementById('examOptionsModal').style.display = 'none'; }
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('examOptionsModal');
-    if (event.target === modal) { modal.style.display = 'none'; }
-});
-
-const searchIndex = [
-    { title: "كتاب اللغة العربية - الجزء الأول", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/Sn0fDYJ.jpeg" },
-    { title: "كتاب اللغة العربية - الجزء الثاني", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/UwbVzH7.jpeg" },
-    { title: "كتاب التربية الإسلامية للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/A7hMcGW.png" },
-    { title: "كتاب اللغة الإنجليزية (الملون)", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/fXwomks.jpeg" },
-    { title: "كتاب الرياضيات للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/I3NLMF8.jpeg" },
-    { title: "كتاب الأحياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/e40CY90.jpeg" },
-    { title: "كتاب الكيمياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/O9JznDB.jpeg" },
-    { title: "كتاب الفيزياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/eLSmykd.jpeg" }
-];
-
-let pageHistory = ['home'];
-
-function showPage(pageId, parentId) {
+// التنقل بين الصفحات
+function showPage(pageId) {
     document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
-    if (target) {
-        target.classList.add('active');
-        if (parentId && pageHistory[pageHistory.length - 1] !== pageId) {
-            pageHistory.push(pageId);
-        }
-        window.scrollTo(0, 0);
-    }
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
 }
-
 function switchPage(pageId, element) {
-    showPage(pageId, 'home');
-    document.querySelectorAll('.side-nav-item').forEach(i => i.classList.remove('active'));
+    showPage(pageId);
+    document.querySelectorAll('.side-nav-item').forEach(item => item.classList.remove('active'));
     if (element) element.classList.add('active');
 }
-
 function goBack() {
-    if (pageHistory.length > 1) {
-        pageHistory.pop();
-        const prevPage = pageHistory[pageHistory.length - 1];
-        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-        const target = document.getElementById(prevPage);
-        if (target) target.classList.add('active');
-    } else {
-        showPage('home');
-    }
+    window.history.back();
 }
-
 function toggleMenu() {
     const overlay = document.getElementById('navOverlay');
     if (overlay) overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
 }
-
 function closeMenu(event) {
     if (event.target.id === 'navOverlay') {
-        toggleMenu();
+        document.getElementById('navOverlay').style.display = 'none';
     }
 }
-
 function hideBadge() {
     const badge = document.getElementById('notifBadge');
     if (badge) badge.style.display = 'none';
 }
-
-function filterItems(section, subject) {
-    event.currentTarget.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    
-    let containerId = section === 'books' ? 'booksListContainer' : (section === 'mlazem' ? 'mlazemListContainer' : (section === 'copies' ? 'copiesListContainer' : 'coursesListContainer'));
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const items = container.querySelectorAll('.book-card-item');
-    items.forEach(item => {
-        const itemSubject = item.getAttribute('data-subject');
-        if (subject === 'all' || itemSubject === subject) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-}
-
 function openSearchModal() {
-    document.getElementById('searchModal').style.display = 'flex';
-    document.getElementById('searchInput').focus();
+    const modal = document.getElementById('searchModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('searchInput').focus();
+    }
 }
-
 function closeSearchModal() {
-    document.getElementById('searchModal').style.display = 'none';
+    const modal = document.getElementById('searchModal');
+    if (modal) modal.style.display = 'none';
 }
-
 function handleSearchInput(e) {
-    const query = e.target.value.toLowerCase().trim();
+    const query = e.target.value.trim().toLowerCase();
     const container = document.getElementById('searchResultsContainer');
     if (!query) {
         container.innerHTML = '<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>';
         return;
     }
-    
-    const results = searchIndex.filter(item => item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query));
-    if (results.length === 0) {
-        container.innerHTML = '<div class="search-no-results">لم يتم العثور على نتائج تطابق بحثك.</div>';
-        return;
-    }
-    
-    container.innerHTML = results.map(item => `
-        <div class="search-result-item" onclick="showPage('${item.page}'); closeSearchModal();">
-            <div class="search-result-content-wrap">
-                <img src="${item.image}" alt="" class="search-result-thumb">
-                <div class="search-result-info">
-                    <span class="search-result-title">${item.title}</span>
-                    <span class="search-result-category">${item.category}</span>
-                </div>
-            </div>
-            <span>➔</span>
-        </div>
-    `).join('');
+    container.innerHTML = '<div class="search-no-results">جاري البحث...</div>';
 }
-
+function filterItems(category, subject) {
+    // فلترة العناصر حسب المادة
+}
 function toggleFloatingMenu() {
     const popup = document.getElementById('floatingMenuPopup');
     if (popup) popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
 }
-
 function toggleAIChat() {
     const chat = document.getElementById('aiChatWindow');
     if (chat) chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
 }
-
+function handleAIPress(e) {
+    if (e.key === 'Enter') sendAIMessage();
+}
 function sendAIMessage() {
     const input = document.getElementById('aiChatInput');
     const body = document.getElementById('aiChatBody');
     if (!input || !input.value.trim()) return;
-    
-    const userText = input.value.trim();
-    body.innerHTML += `<div class="ai-message user" style="background:#2563eb; color:#fff; padding:8px 12px; border-radius:10px; margin:5px 0; max-width:80%; margin-right:auto;">${userText}</div>`;
+    const userText = input.value;
+    body.innerHTML += `<div class="ai-message user">${userText}</div>`;
     input.value = '';
-    
     setTimeout(() => {
-        body.innerHTML += `<div class="ai-message bot" style="background:#f1f5f9; color:#1e293b; padding:8px 12px; border-radius:10px; margin:5px 0; max-width:80%;">أهلاً بك يا مصطفى! أنا مساعد المنصة. يمكنك تصفح الكتب، الملازم، أو استخدام أزرار التحميل المباشر لقناتنا على التليجرام.</div>`;
+        body.innerHTML += `<div class="ai-message bot">أهلاً بك يا مصطفى! أعمل جاهدًّا لمساعدتك في تفوقك الدراسي.</div>`;
         body.scrollTop = body.scrollHeight;
-    }, 1000);
+    }, 500);
+}
+function openExamModal() {
+    const modal = document.getElementById('examOptionsModal');
+    if (modal) modal.style.display = 'flex';
+}
+function closeExamModal() {
+    const modal = document.getElementById('examOptionsModal');
+    if (modal) modal.style.display = 'none';
 }
 
-function handleAIPress(e) {
-    if (e.key === 'Enter') sendAIMessage();
-}
-
-let slideIndex = 0;
-function currentSlide(n) {
-    slideIndex = n;
-    showSlides();
-}
-function showSlides() {
-    const track = document.getElementById('adsTrack');
-    const dots = document.querySelectorAll('.slider-dot');
-    if (!track) return;
-    if (slideIndex >= dots.length) slideIndex = 0;
-    if (slideIndex < 0) slideIndex = dots.length - 1;
-    track.style.transform = `translateX(${-slideIndex * 100}%)`;
-    dots.forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === slideIndex);
-    });
-}
-setInterval(() => {
-    slideIndex++;
-    showSlides();
-}, 4000);
+// تهيئة التصويتات عند تحميل الصفحة
+window.addEventListener('DOMContentLoaded', () => {
+    updateArabicVoteUI();
+    updateIslamicVoteUI();
+    updateMathVoteUI();
+    updateEnglishVoteUI();
+    updateChemistryVoteUI();
+    updatePhysicsVoteUI();
+    updateBiologyVoteUI();
+});
 </script>
 </body>
 </html>
