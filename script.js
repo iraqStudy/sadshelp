@@ -1,5 +1,4 @@
 (function() {
-    // حماية لمنع تكرار تشغيل الكود أو تعارض المتغيرات إذا تم تضمينه مرتين
     if (window._siteAppInitialized) return;
     window._siteAppInitialized = true;
 
@@ -151,7 +150,8 @@
         renderArabicTeachers();
     };
 
-    window.filterItems = function(sectionType, subjectName) {
+    // تم تعديل الدالة لاستقبال عنصر الزر مباشرة (this) لتفادي مشاكل النطاق
+    window.filterItems = function(sectionType, subjectName, btnElement) {
         let containerId = '';
         if(sectionType === 'books') containerId = 'booksListContainer';
         else if(sectionType === 'mlazem') containerId = 'mlazemListContainer';
@@ -161,11 +161,10 @@
         const container = document.getElementById(containerId);
         if(!container) return;
 
-        const eventTarget = event.currentTarget;
-        if(eventTarget) {
-            const parentBar = eventTarget.parentElement;
+        if(btnElement) {
+            const parentBar = btnElement.parentElement;
             parentBar.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
-            eventTarget.classList.add('active');
+            btnElement.classList.add('active');
         }
 
         const items = container.querySelectorAll('.book-card-item');
@@ -215,15 +214,6 @@
             document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
             document.getElementById(previousPage)?.classList.add('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
-            if(['home', 'teachers-page', 'books-page', 'mlazem-page', 'ministerial-copies-page', 'chats-page', 'notifications-page', 'courses-page', 'ministerial-page'].includes(previousPage)) {
-                document.querySelectorAll('.side-nav-item').forEach(item => {
-                    if(item.getAttribute('data-page') === previousPage) {
-                        item.classList.add('active');
-                    } else {
-                        item.classList.remove('active');
-                    }
-                });
-            }
         }
     };
 
@@ -231,12 +221,12 @@
         const overlay = document.getElementById('navOverlay');
         const floatingContainer = document.getElementById('floatingContainer');
         const aiChatWindow = document.getElementById('aiChatWindow');
-        overlay.classList.toggle('active');
-        if(overlay.classList.contains('active')) {
-            floatingContainer.classList.add('hidden-floating');
-            aiChatWindow.classList.remove('active');
+        if(overlay) overlay.classList.toggle('active');
+        if(overlay && overlay.classList.contains('active')) {
+            if(floatingContainer) floatingContainer.classList.add('hidden-floating');
+            if(aiChatWindow) aiChatWindow.classList.remove('active');
         } else {
-            floatingContainer.classList.remove('hidden-floating');
+            if(floatingContainer) floatingContainer.classList.remove('hidden-floating');
         }
     };
 
@@ -247,11 +237,13 @@
     };
 
     window.hideBadge = function() {
-        document.getElementById('notifBadge').style.display = 'none';
+        const badge = document.getElementById('notifBadge');
+        if(badge) badge.style.display = 'none';
     };
 
     window.toggleFloatingMenu = function() {
-        document.getElementById('floatingMenuPopup').classList.toggle('active');
+        const popup = document.getElementById('floatingMenuPopup');
+        if(popup) popup.classList.toggle('active');
     };
 
     window.addEventListener('click', function(e) {
@@ -263,10 +255,10 @@
     });
 
     window.toggleAIChat = function() {
-        document.getElementById('aiChatWindow').classList.toggle('active');
+        const chatWin = document.getElementById('aiChatWindow');
+        if(chatWin) chatWin.classList.toggle('active');
     };
 
-    // --- محرك الذكاء الاصطناعي الخارق وخبير منهج السادس الإعدادي العراقي ---
     function getSmartAIResponse(userText) {
         const rawText = userText.trim();
         const text = rawText.toLowerCase();
@@ -292,51 +284,15 @@
             }
         }
 
-        if (text.includes('مواد') || text.includes('كم مادة') || text.includes('ايش قد مواد')) {
-            return `📚 مواد السادس الإعدادي (الفرع العلمي) في العراق تتكون من 7 مواد أساسية (+ اللغة الفرنسية كمادة اختيارية ثانية):\n1. التربية الإسلامية\n2. اللغة العربية (قواعد وأدب)\n3. اللغة الإنجليزية (8 وحدات)\n4. الرياضيات (6 فصول)\n5. الفيزياء (11 فصل)\n6. الكيمياء (8 فصول)\n7. الأحياء (5 فصول للإحيائي)\n8. اللغة الفرنسية (اللغة الأجنبية الثانية).`;
+        if (text.includes('مواد') || text.includes('كم مادة')) {
+            return `📚 مواد السادس الإعدادي (الفرع العلمي) في العراق تتكون من 7 مواد أساسية (+ اللغة الفرنسية كمادة اختيارية).`;
         }
 
-        if (text.includes('رياضيات') || text.includes('فصول الرياضيات')) {
-            return `📐 منهج الرياضيات للسادس العلمي يتكون من 6 فصول رئيسية:\n• الفصل الأول: الأعداد المركبة.\n• الفصل الثاني: القطوع المخروطية.\n• الفصل الثالث: التفاضل وتطبيقاته (المعدلات الزمنية، التقرير، التزايد والتناقص، الرسم).\n• الفصل الرابع: التكامل وتطبيقاته (المحدد وغير المحدد، المساحات).\n• الفصل الخامس: المعادلات التفاضلية العادية.\n• الفصل السادس: تطبيقات علمية (أو الهندسة حسب التقليص الوزاري).`;
+        if (text.includes('مرحبا') || text.includes('هلا')) {
+            return `أهلاً بك يا مصطفى! أنا خبيرك الذكي في منهج السادس الإعدادي في العراق، كيف أستطيع خدمتك اليوم؟`;
         }
 
-        if (text.includes('فيزياء') || text.includes('فصول الفيزياء')) {
-            return `⚡ منهج الفيزياء للسادس العلمي يتكون من 11 فصلاً:\n1. المتجهات والحث الكهرومغناطيسي.\n2. الحث المتبادل والذاتي.\n3. التيار المتناوب والدوائر المهتزة.\n4. الموجات الكهرومغناطيسية.\n5. البصريات الفيزيائية (التداخل والحيود).\n6. الفيزياء الحديثة (النسبية، أينشتاين).\n7. إلكترونيات الحالة الصلبة والدوائر المتكاملة.\n8. الأطياف الذرية والليزر.\n9. النوى الذرية والنشاط الإشعاعي.\n10 & 11. الفصول الخاصة بالتقليصات أو التطبيقي/الإحيائي.`;
-        }
-
-        if (text.includes('كيمياء') || text.includes('فصول الكيمياء')) {
-            return `🧪 منهج الكيمياء للسادس العلمي يتكون من 8 فصول:\n• الفصل الأول: علم الثرمودايناميك.\n• الفصل الثاني: الاتزان الكيميائي.\n• الفصل الثالث: الاتزان الأيوني (الحوامض والقواعد).\n• الفصل الرابع: الكيمياء الكهربائية.\n• الفصل الخامس: الكيمياء التناسقية.\n• الفصل السادس: التحليل الكيميائي.\n• الفصل السابع: الكيمياء العضوية.\n• الفصل الثامن: الكيمياء الصناعية.`;
-        }
-
-        if (text.includes('احياء') || text.includes('أحياء') || text.includes('فصول الأحياء')) {
-            return `🧬 منهج الأحياء للسادس العلمي (الإحيائي) يتكون من 5 فصول جوهرية:\n• الفصل الأول: الخلية (تركيبها، العضيات، الانقسام الخلوي).\n• الفصل الثاني: النسيج (الأنسجة النباتية والحيوانية).\n• الفصل الثالث: التكاثر (في النباتات والحيوانات والإنسان).\n• الفصل الرابع: التكوين الجنيني.\n• الفصل الخامس: الوراثة (مندل، المورثات المميتة، المجاميع الدموية، الخريطة الجينية).`;
-        }
-
-        if (text.includes('عربي') || text.includes('قواعد العربي') || text.includes('أدب')) {
-            return `📖 منهج اللغة العربية للسادس الإعدادي ينقسم إلى قسمين رئيسيين:\n1. القواعد (تضم مواضيع: الاستفهام، النفي، الاستثناء، التقديم والتاخير، التوكيد، النداء، التعجب، المدح والذم، الخصائص).\n2. الأدب والنصوص (يضم الشعر الحديث، المدارس الشعرية مثل الديوان، المهجر، الإحياء، النثر، القصائد المطلوبة للحفظ، وحياة الشعراء).`;
-        }
-
-        if (text.includes('فرنسي') || text.includes('فرنساوي') || text.includes('لغة فرنسية')) {
-            return `🇫🇷 منهج اللغة الفرنسية للسادس الإعدادي في العراق:\n• يعتبر الفرنسية اللغة الأجنبية الثانية (بديل التركية أو الفارسية في بعض المدارس الأهلية أو الحكومية).\n• يتكون المنهج من وحدات دراسية (Unité 1 إلى Unité 6 تقريباً).\n• يركز على: قواعد اللغة (La Grammaire)، تصريف الأفعال (Les Verbes)، القطع الاستيعابية (Les Comprehensions)، الإنشاءات (Les Productions écrites)، والمفردات والأسئلة الوزارية المهمة.\nهل تحتاج إلى ملخص أو قاعدة معينة في الفرنسية يا مصطفى؟`;
-        }
-
-        if (text.includes('انكليزي') || text.includes('إنجليزي') || text.includes('units')) {
-            return `🇬🇧 منهج اللغة الإنجليزية للسادس الإعدادي يتكون من 8 وحدات (Units 1 to 8)، وتتضمن:\n• القواعد (Grammar) لكل وحدة.\n• المفردات والإملاء (Vocabulary & Spelling).\n• القطع الاستيعابية (Reading Comprehensions).\n• القصص المقررة (Literature Spotlight مثل قصة The Canary).\n• الإنشاءات (Writing) لكل وحدة وزارية.`;
-        }
-
-        if (text.includes('مرحبا') || text.includes('هلا') || text.includes('أهلا') || text.includes('سلام')) {
-            return `أهلاً بك يا مصطفى! بصفتي خبيرك الذكي في منهج السادس الإعدادي في العراق، أنا جاهز لإجابتك عن أي مادة، عدد فصول، مواضيع داخلية، وزاريات، أو قواعد فرنسية وإنجليزية. ماذا تريد أن تراجع اليوم؟`;
-        }
-
-        if (text.includes('كيف حالك') || text.includes('شلونك')) {
-            return `بأعلى جاهزية تامة يا مصطفى! أمتلك كامل معلومات المناهج العراقية للسادس الإعدادي. كيف أستطيع خدمتك الآن؟`;
-        }
-
-        if (text.includes('برمجة') || text.includes('كود') || text.includes('html') || text.includes('css') || text.includes('javascript')) {
-            return `بما أنك تطور منصة "شيرادله السادس"، يمكنني مساعدتك في أي كود جافاسكريبت، تنظيم الـ LocalStorage، أو تحسين الواجهات البرمجية للموقع فوراً. ما هي المشكلة البرمجية التي تواجهك؟`;
-        }
-
-        return `سؤال ذكي جداً يا مصطفى! بصفتي النظام الذكي الشامل لمنصتك والمطلع على تفاصيل المنهج العراقي للسادس الإعدادي، يمكننا تحليل هذا الموضوع من كافة الزوايا. \n\nإذا أردت تعليمي إجابة مخصصة لهذا السؤال لتنضم إلى ذاكرتي الدائمة، اكتب لي:\nتعلم: ${rawText} = [الجواب المناسب]\nأو أخبرني بالتفصيل لنناقشه معاً!`;
+        return `سؤال ذكي يا مصطفى! إذا أردت تعليمي إجابة مخصصة، اكتب:\nتعلم: ${rawText} = [الجواب المناسب]`;
     }
 
     window.sendAIMessage = function() {
