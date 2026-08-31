@@ -554,7 +554,7 @@
 </div>
 </div>
 </div>
-<script>
+<script type="module">
 function updateCountdown() {
     const targetDate = new Date('2026-08-27T07:00:00+03:00').getTime();
     const now = new Date().getTime();
@@ -865,15 +865,6 @@ function updateBiologyVoteUI() {
     });
     sortTeacherContainer('#teacher-biology .books-list-container');
 }
-
-// تهيئة جميع أنظمة التصويت عند التحميل
-updateArabicVoteUI();
-updateIslamicVoteUI();
-updateMathVoteUI();
-updateEnglishVoteUI();
-updateChemistryVoteUI();
-updatePhysicsVoteUI();
-updateBiologyVoteUI();
 </script>
 </body>
 </html>
