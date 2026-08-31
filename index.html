@@ -27,8 +27,6 @@
 .search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 .search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
 .search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
-.page-view { display: none; }
-.page-view.active { display: block; }
 </style>
 </head>
 <body>
@@ -868,99 +866,14 @@ function updateBiologyVoteUI() {
     sortTeacherContainer('#teacher-biology .books-list-container');
 }
 
-// التنقل بين الصفحات
-function showPage(pageId) {
-    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    window.scrollTo(0, 0);
-}
-function switchPage(pageId, element) {
-    showPage(pageId);
-    document.querySelectorAll('.side-nav-item').forEach(item => item.classList.remove('active'));
-    if (element) element.classList.add('active');
-}
-function goBack() {
-    window.history.back();
-}
-function toggleMenu() {
-    const overlay = document.getElementById('navOverlay');
-    if (overlay) overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
-}
-function closeMenu(event) {
-    if (event.target.id === 'navOverlay') {
-        document.getElementById('navOverlay').style.display = 'none';
-    }
-}
-function hideBadge() {
-    const badge = document.getElementById('notifBadge');
-    if (badge) badge.style.display = 'none';
-}
-function openSearchModal() {
-    const modal = document.getElementById('searchModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        document.getElementById('searchInput').focus();
-    }
-}
-function closeSearchModal() {
-    const modal = document.getElementById('searchModal');
-    if (modal) modal.style.display = 'none';
-}
-function handleSearchInput(e) {
-    const query = e.target.value.trim().toLowerCase();
-    const container = document.getElementById('searchResultsContainer');
-    if (!query) {
-        container.innerHTML = '<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>';
-        return;
-    }
-    container.innerHTML = '<div class="search-no-results">جاري البحث...</div>';
-}
-function filterItems(category, subject) {
-    // فلترة العناصر حسب المادة
-}
-function toggleFloatingMenu() {
-    const popup = document.getElementById('floatingMenuPopup');
-    if (popup) popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
-}
-function toggleAIChat() {
-    const chat = document.getElementById('aiChatWindow');
-    if (chat) chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-}
-function handleAIPress(e) {
-    if (e.key === 'Enter') sendAIMessage();
-}
-function sendAIMessage() {
-    const input = document.getElementById('aiChatInput');
-    const body = document.getElementById('aiChatBody');
-    if (!input || !input.value.trim()) return;
-    const userText = input.value;
-    body.innerHTML += `<div class="ai-message user">${userText}</div>`;
-    input.value = '';
-    setTimeout(() => {
-        body.innerHTML += `<div class="ai-message bot">أهلاً بك يا مصطفى! أعمل جاهدًّا لمساعدتك في تفوقك الدراسي.</div>`;
-        body.scrollTop = body.scrollHeight;
-    }, 500);
-}
-function openExamModal() {
-    const modal = document.getElementById('examOptionsModal');
-    if (modal) modal.style.display = 'flex';
-}
-function closeExamModal() {
-    const modal = document.getElementById('examOptionsModal');
-    if (modal) modal.style.display = 'none';
-}
-
-// تهيئة التصويتات عند تحميل الصفحة
-window.addEventListener('DOMContentLoaded', () => {
-    updateArabicVoteUI();
-    updateIslamicVoteUI();
-    updateMathVoteUI();
-    updateEnglishVoteUI();
-    updateChemistryVoteUI();
-    updatePhysicsVoteUI();
-    updateBiologyVoteUI();
-});
+// تهيئة جميع أنظمة التصويت عند التحميل
+updateArabicVoteUI();
+updateIslamicVoteUI();
+updateMathVoteUI();
+updateEnglishVoteUI();
+updateChemistryVoteUI();
+updatePhysicsVoteUI();
+updateBiologyVoteUI();
 </script>
 </body>
 </html>
