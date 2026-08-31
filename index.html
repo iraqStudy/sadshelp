@@ -383,7 +383,7 @@
 <div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
 <div class="book-actions-row"><a href="https://t.me/zmoiibot?start=wfjnAAuZ" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
 </div>
-<div class="book-image-side"><a href="https://i.imgur.com/O9JznDB.jpeg" target="_blank"><img src="https://i.imgur.com/O9JznDB.jpeg" alt="كتاب الكيمياء" class="book-image-custom"></a></div>
+<div class="book-image-side"><a href="https://t.me/imgur/O9JznDB.jpeg" target="_blank"><img src="https://i.imgur.com/O9JznDB.jpeg" alt="كتاب الكيمياء" class="book-image-custom"></a></div>
 </div>
 <div class="book-card-item" data-subject="الفيزياء">
 <div class="book-info-side">
@@ -885,97 +885,47 @@ const searchIndex = [
     { title: "كتاب اللغة العربية - الجزء الأول", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/Sn0fDYJ.jpeg" },
     { title: "كتاب اللغة العربية - الجزء الثاني", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/UwbVzH7.jpeg" },
     { title: "كتاب التربية الإسلامية للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/A7hMcGW.png" },
-    { title: "كتاب اللغة الإنجليزية (الملون) للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/fXwomks.jpeg" },
-    { title: "كتاب النشاط للغة الإنجليزية للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/0gIju6E.jpeg" },
-    { title: "كتاب الرياضيات للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/I3NLMF8.jpeg" },
-    { title: "كتاب الأحياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/e40CY90.jpeg" },
-    { title: "كتاب الكيمياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/O9JznDB.jpeg" },
-    { title: "كتاب الفيزياء للسادس العلمي", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/eLSmykd.jpeg" },
-    { title: "ملزمة قواعد اللغة العربية - الأستاذ عقيل الزبيدي", category: "الملازم", page: "mlazem-page", image: "https://i.imgur.com/JM08nuw.jpeg" },
-    { title: "ملزمة الأدب والنصوص - السادس الاعدادي", category: "الملازم", page: "mlazem-page", image: "https://i.imgur.com/qJPcFAY.jpeg" },
-    { title: "ملزمة الرياضيات - السادس العلمي", category: "الملازم", page: "mlazem-page", image: "https://i.imgur.com/yxbFxrp.jpeg" },
-    { title: "ملزمة الكيمياء الشاملة", category: "الملازم", page: "mlazem-page", image: "https://i.imgur.com/hFKC4G6.jpeg" },
-    { title: "ملزمة الفيزياء - الأستاذ حسين محمد", category: "الملازم", page: "mlazem-page", image: "https://i.imgur.com/tgoLB13.jpeg" },
-    { title: "الدورة الإلكترونية - التربية الإسلامية", category: "الدورات الإلكترونية", page: "courses-page", image: "https://i.imgur.com/qZrADNS.jpeg" },
-    { title: "الدورة الإلكترونية - اللغة العربية", category: "الدورات الإلكترونية", page: "courses-page", image: "https://i.imgur.com/Nx5NHcF.jpeg" },
-    { title: "الدورة الإلكترونية - الكيمياء", category: "الدورات الإلكترونية", page: "courses-page", image: "https://i.imgur.com/o3KAlh9.jpeg" },
-    { title: "الدورة الإلكترونية - الفيزياء", category: "الدورات الإلكترونية", page: "courses-page", image: "https://i.imgur.com/oVrvbA7.jpeg" },
-    { title: "النسخ الوزارية الرسمية للسادس الإعدادي", category: "النسخ الوزارية", page: "ministerial-copies-page", image: "https://i.imgur.com/sM7xbQT.jpeg" },
-    { title: "جدول امتحانات السادس الإعدادي (الدور الثاني)", category: "الامتحانات", page: "exam-detail-page", image: "https://i.imgur.com/26IFSw6.jpeg" }
+    { title: "كتاب اللغة الإنجليزية", category: "الكتب المنهجية", page: "books-page", image: "https://i.imgur.com/fXwomks.jpeg" }
 ];
+
 function openSearchModal() {
-    const modal = document.getElementById('searchModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        const input = document.getElementById('searchInput');
-        if (input) {
-            input.value = '';
-            input.focus();
-            renderSearchResults('');
-        }
-    }
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').focus();
 }
+
 function closeSearchModal() {
-    const modal = document.getElementById('searchModal');
-    if (modal) { modal.style.display = 'none'; }
+    document.getElementById('searchModal').style.display = 'none';
 }
-function handleSearchInput(e) {
-    const query = e.target.value.trim().toLowerCase();
-    renderSearchResults(query);
-}
-function renderSearchResults(query) {
+
+function handleSearchInput(event) {
+    const query = event.target.value.trim().toLowerCase();
     const container = document.getElementById('searchResultsContainer');
-    if (!container) return;
+    
     if (!query) {
         container.innerHTML = '<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>';
         return;
     }
-    const results = searchIndex.filter(item => {
-        const titleLower = item.title.toLowerCase();
-        const catLower = item.category.toLowerCase();
-        return titleLower.includes(query) || catLower.includes(query);
-    });
-    results.sort((a, b) => {
-        const aStarts = a.title.toLowerCase().startsWith(query);
-        const bStarts = b.title.toLowerCase().startsWith(query);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return 0;
-    });
+
+    const results = searchIndex.filter(item => item.title.toLowerCase().includes(query));
+
     if (results.length === 0) {
-        container.innerHTML = '<div class="search-no-results">لم يتم العثور على نتائج مطابقة لـ "' + query + '"</div>';
+        container.innerHTML = '<div class="search-no-results">لم يتم العثور على نتائج مطابقة لبحثك.</div>';
         return;
     }
-    let html = '';
-    results.forEach(item => {
-        let imgTag = item.image ? `<img src="${item.image}" alt="${item.title}" class="search-result-thumb">` : `<div class="search-result-thumb" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">📄</div>`;
-        html += `
-            <div class="search-result-item" onclick="selectSearchResult('${item.page}')">
-                <div class="search-result-content-wrap">
-                    ${imgTag}
-                    <div class="search-result-info">
-                        <div class="search-result-title">${item.title}</div>
-                        <div class="search-result-category">${item.category}</div>
-                    </div>
+
+    container.innerHTML = results.map(item => `
+        <div class="search-result-item" onclick="showPage('${item.page}'); closeSearchModal();">
+            <div class="search-result-content-wrap">
+                <img src="${item.image}" alt="${item.title}" class="search-result-thumb">
+                <div class="search-result-info">
+                    <span class="search-result-title">${item.title}</span>
+                    <span class="search-result-category">${item.category}</span>
                 </div>
-                <span style="color: #64748b; font-size: 0.9rem;">➔</span>
             </div>
-        `;
-    });
-    container.innerHTML = html;
+            <span>➔</span>
+        </div>
+    `).join('');
 }
-function selectSearchResult(pageId) {
-    closeSearchModal();
-    if (typeof showPage === 'function') { showPage(pageId); }
-}
-window.addEventListener('click', function(event) {
-    const searchModal = document.getElementById('searchModal');
-    if (event.target === searchModal) { closeSearchModal(); }
-});
-window.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') { closeSearchModal(); }
-});
 </script>
-<script src="script.js"></script>
 </body>
 </html>
