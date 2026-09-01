@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>النسخ الوزارية - شيرادله السادس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+@keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.search-toggle-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; color: var(--text-color, #1e293b); transition: background 0.2s; }
+.search-toggle-btn:hover { background: rgba(0,0,0,0.05); }
+.search-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: flex-start; padding-top: 80px; animation: modalPop 0.2s ease; }
+.search-modal-box { background: var(--card-bg, #fff); width: 90%; max-width: 600px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; max-height: 80vh; border: 1px solid #e2e8f0; }
+.search-input-wrapper { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; gap: 12px; }
+.search-modal-input { flex: 1; border: none; background: transparent; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; color: var(--text-color, #1e293b); outline: none; direction: rtl; }
+.search-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); padding: 0 5px; }
+.search-results-container { overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 400px; }
+.search-result-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: #fff; border: 1px solid #edf2f7; text-decoration: none; color: inherit; transition: all 0.2s; cursor: pointer; }
+.search-result-item:hover { background: #f1f5f9; border-color: #cbd5e1; transform: translateX(-3px); }
+.search-result-content-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+.search-result-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid #e2e8f0; }
+.search-result-info { display: flex; flex-direction: column; gap: 2px; }
+.search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
+.search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
+.search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
+.page-view { display: none; }
+.page-view.active { display: block; }
+</style>
+</head>
+<body>
+<nav class="side-nav-bar"><div class="side-nav-links">
+<div class="side-nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>الرئيسية</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span>المدرسين</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg><span>سوالف</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>الإشعارات</span></div>
+</div></nav>
+<header>
+<div class="logo-container" onclick="window.location.href='index.html'">
+<div class="logo-icon"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;"></div>
+<div class="logo-text"><h1>شيرادله</h1><h2>السادس</h2></div>
+</div>
+<div class="header-actions">
+<button class="search-toggle-btn" onclick="openSearchModal()" title="بحث"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+<button class="menu-toggle" onclick="toggleMenu()" title="القائمة"><span></span><span></span><span></span></button>
+</div>
+</header>
+<div id="navOverlay" class="nav-overlay" onclick="closeMenu(event)"><div class="nav-drawer" onclick="event.stopPropagation()">
+<div>
+<div class="drawer-header">
+<div class="drawer-brand"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;"><span style="font-weight:900; font-size:1.1rem;">شيرادله السادس</span></div>
+<button class="close-drawer" onclick="toggleMenu()">&times;</button>
+</div>
+<div class="drawer-menu-list">
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>🏠</span> الصفحة الرئيسية</div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>👨‍🏫</span> قائمة المدرسين</div>
+<div onclick="window.location.href='books.html'; toggleMenu();" class="drawer-link"><span>📚</span> الكتب المنهجية</div>
+<div onclick="window.location.href='malazm.html'; toggleMenu();" class="drawer-link"><span>📖</span> الملازم</div>
+<div onclick="window.location.href='newiraq.html'; toggleMenu();" class="drawer-link"><span>📋</span> النسخ الوزارية</div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>💬</span> سوالف</div>
+<div onclick="window.location.href='videos.html'; toggleMenu();" class="drawer-link"><span>💻</span> الدورات الإلكترونية</div>
+<div onclick="window.location.href='exams.html'; toggleMenu();" class="drawer-link"><span>📝</span> الامتحانات الوزارية</div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>🔔</span> مركز الإشعارات</div>
+</div>
+</div>
+<div><div class="drawer-footer">جميع الحقوق محفوظة © منصة شيرادله السادس</div></div>
+</div></div>
+<main>
+<div id="ministerial-copies-page" class="page-view active" data-parent="home">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="window.location.href='index.html'"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">📋 قسم النسخ الوزارية</h2><p class="page-subtitle">أرشيف النسخ الوزارية الرسمية لجميع المواد الدراسية للسادس العلمي</p></div>
+<div class="subject-filter-bar">
+<div class="filter-chip active" onclick="filterItems('copies', 'all')">الكل</div>
+<div class="filter-chip" onclick="filterItems('copies', 'اللغه العربيه')">اللغه العربيه</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الاسلاميه')">الاسلاميه</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الإنكليزي')">الإنكليزي</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الرياضيات')">الرياضيات</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الأحياء')">الأحياء</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الكيمياء')">الكيمياء</div>
+<div class="filter-chip" onclick="filterItems('copies', 'الفيزياء')">الفيزياء</div>
+</div>
+<div class="books-list-container" id="copiesListContainer"></div></div>
+</main>
+<div id="floatingContainer" class="floating-chat-container">
+<div class="floating-msg-wrapper">
+<div id="floatingMenuPopup" class="floating-menu-popup">
+<a href="https://t.me/zmoiibot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تحميل الملازم والكتب</span></a>
+<a href="https://t.me/vxcznvbot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تواصل مع الدعم الفني</span></a>
+</div>
+<button class="floating-msg-btn" onclick="toggleFloatingMenu()" title="تواصل معنا"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg></button>
+</div>
+<button class="floating-btn-item floating-ai-btn" onclick="toggleAIChat()" title="مساعد الذكاء الاصطناعي">🤖</button>
+</div>
+<div id="aiChatWindow" class="ai-chat-window">
+<div class="ai-chat-header"><div class="ai-chat-title"><span>🤖</span> مساعد شيرادله الذكي</div><button class="ai-close-btn" onclick="toggleAIChat()">&times;</button></div>
+<div class="ai-chat-body" id="aiChatBody"><div class="ai-message bot">أهلاً بك يا مصطفى! أنا مساعد المنصة، كيف يمكنني مساعدتك في دراستك اليوم؟</div></div>
+<div class="ai-chat-footer">
+<input type="text" id="aiChatInput" class="ai-chat-input" placeholder="اكتب رسالتك هنا..." onkeypress="handleAIPress(event)">
+<button class="ai-send-btn" onclick="sendAIMessage()"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+</div>
+</div>
+<div id="searchModal" class="search-modal-overlay">
+<div class="search-modal-box" onclick="event.stopPropagation()">
+<div class="search-input-wrapper">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="#64748b"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" id="searchInput" class="search-modal-input" placeholder="ابحث عن ملزمة، دورة، نسخة وزارية، أو امتحان..." oninput="handleSearchInput(event)">
+<button class="search-close-btn" onclick="closeSearchModal()">&times;</button>
+</div>
+<div id="searchResultsContainer" class="search-results-container">
+<div class="search-no-results">اكتب اسم الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>
+</div>
+</div>
+</div>
+<script>
+function toggleMenu() {
+    const overlay = document.getElementById('navOverlay');
+    if (overlay) {
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function closeMenu(event) {
+    if (event.target.id === 'navOverlay') {
+        document.getElementById('navOverlay').style.display = 'none';
+    }
+}
+
+function filterItems(type, subject) {
+    let containerId = 'copiesListContainer';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const items = container.querySelectorAll('.book-card-item');
+    items.forEach(item => {
+        const itemSubject = item.getAttribute('data-subject');
+        if (subject === 'all' || itemSubject === subject) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function openSearchModal() {
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').focus();
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
+}
+
+window.addEventListener('click', function(event) {
+    const searchModal = document.getElementById('searchModal');
+    if (event.target === searchModal) {
+        closeSearchModal();
+    }
+});
+
+const searchIndex = [];
+
+function handleSearchInput(e) {
+    const query = e.target.value.trim().toLowerCase();
+    const container = document.getElementById('searchResultsContainer');
+    if (!query) {
+        container.innerHTML = '<div class="search-no-results">اكتب اسم الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>';
+        return;
+    }
+    const results = searchIndex.filter(item => item.title.toLowerCase().includes(query));
+    if (results.length === 0) {
+        container.innerHTML = '<div class="search-no-results">لا توجد نتائج مطابقة لبحثك</div>';
+        return;
+    }
+    container.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="window.location.href='index.html'; closeSearchModal();">
+            <div class="search-result-content-wrap">
+                <img src="${r.image}" class="search-result-thumb" alt="${r.title}">
+                <div class="search-result-info">
+                    <span class="search-result-title">${r.title}</span>
+                    <span class="search-result-category">${r.category}</span>
+                </div>
+            </div>
+            <span>➔</span>
+        </div>
+    `).join('');
+}
+</script>
+</body>
+</html>
