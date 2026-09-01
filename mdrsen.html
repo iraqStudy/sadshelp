@@ -124,44 +124,40 @@ function handleSearchInput(e) {
     `).join('');
 }
 
-function sortTeacherContainer(containerSelector) {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-    const cards = Array.from(container.querySelectorAll('.book-card-item'));
-    cards.sort((a, b) => {
-        const countA = parseInt(a.querySelector('[id^="votes-count-"]').innerText || '0');
-        const countB = parseInt(b.querySelector('[id^="votes-count-"]').innerText || '0');
-        return countB - countA;
-    });
-    cards.forEach(card => container.appendChild(card));
-}
-
 const categories = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
 
+// دالة تصويت خالية من الأخطاء التداخلية
 function voteTeacher(category, teacherId) {
     let userVote = localStorage.getItem('user_vote_' + category);
-    let voteRef = db.ref('votes/' + category + '/' + teacherId);
 
-    voteRef.transaction(currentVotes => {
-        currentVotes = currentVotes || 0;
-        if (userVote === teacherId) {
-            localStorage.removeItem('user_vote_' + category);
-            return Math.max(0, currentVotes - 1);
-        } else {
-            if (userVote) {
-                let prevVoteRef = db.ref('votes/' + category + '/' + userVote);
-                prevVoteRef.transaction(prevCount => Math.max(0, (prevCount || 1) - 1));
+    if (userVote === teacherId) {
+        // إذا كان المستخدم قد صوت لهذا المدرس مسبقاً، يقوم بإلغاء صوته
+        db.ref('votes/' + category + '/' + teacherId).transaction(currentVotes => {
+            return Math.max(0, (currentVotes || 0) - 1);
+        }, (error) => {
+            if (!error) {
+                localStorage.removeItem('user_vote_' + category);
             }
-            localStorage.setItem('user_vote_' + category, teacherId);
-            return currentVotes + 1;
+        });
+    } else {
+        // إذا كان مصوتاً لشخص آخر سابقاً، نقوم بإلغاء صوت الشخص القديم أولاً بشكل منفصل وآمن
+        if (userVote) {
+            db.ref('votes/' + category + '/' + userVote).transaction(prevCount => {
+                return Math.max(0, (prevCount || 1) - 1);
+            });
         }
-    }, (error) => {
-        if (error) {
-            console.error('فشل عملية التصويت:', error);
-        }
-    });
+        // ثم إضافة الصوت للمدرس الجديد
+        db.ref('votes/' + category + '/' + teacherId).transaction(currentVotes => {
+            return (currentVotes || 0) + 1;
+        }, (error) => {
+            if (!error) {
+                localStorage.setItem('user_vote_' + category, teacherId);
+            }
+        });
+    }
 }
 
+// دالة جلب الأصوات والفرز اللحظي بناءً على بيانات الداتابيز المباشرة
 function initRealtimeVotes() {
     categories.forEach(cat => {
         let categoryRef = db.ref('votes/' + cat);
@@ -173,11 +169,22 @@ function initRealtimeVotes() {
             if (!container) return;
 
             let cards = Array.from(container.querySelectorAll('.book-card-item'));
+            
+            // فرز البطاقات بناءً على عدد الأصوات الفعلي في قاعدة البيانات مباشرة لتفادي مشاكل DOM
+            cards.sort((a, b) => {
+                let idA = a.getAttribute('data-teacher-id');
+                let idB = b.getAttribute('data-teacher-id');
+                let countA = data[idA] || 0;
+                let countB = data[idB] || 0;
+                return countB - countA;
+            });
+
+            // تحديث الواجهة وإعادة ترتيب العناصر داخل الحاوية
             cards.forEach(card => {
                 let tId = card.getAttribute('data-teacher-id');
                 let votes = data[tId] || 0;
                 
-                let countEl = document.getElementById('votes-count-' + tId);
+                let countEl = document.getElementById('votes-count-'  + tId);
                 let btnEl = document.getElementById('vote-btn-' + tId);
                 let textEl = document.getElementById('vote-text-' + tId);
 
@@ -191,9 +198,8 @@ function initRealtimeVotes() {
                         textEl.innerText = 'تصويت';
                     }
                 }
+                container.appendChild(card);
             });
-
-            sortTeacherContainer('#teacher-' + cat + ' .books-list-container');
         });
     });
 }
