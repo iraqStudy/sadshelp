@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, updateDoc, increment, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, doc, updateDoc, increment, onSnapshot, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCd3_U0LhAJLBqZH4sK2Hf_hCDNhW7ajxQ",
@@ -19,40 +19,43 @@ const db = getFirestore(app);
     if (window._siteAppInitialized) return;
     window._siteAppInitialized = true;
 
-    // --- كود السلايدر المتحرك ---
+    // --- كود السلايدر المتحرك (يتم تفعيله عند جاهزية DOM) ---
     let currentSlideIndex = 0;
-    const slides = document.querySelectorAll('.ad-slide-item');
-    const dots = document.querySelectorAll('.slider-dot');
-    const track = document.getElementById('adsTrack');
+    let slideInterval;
 
-    function updateSlider() {
-        if(!track) return;
-        track.style.transform = `translateX(${currentSlideIndex * 100}%)`;
-        dots.forEach((dot, idx) => {
-            dot.classList.toggle('active', idx === currentSlideIndex);
-        });
+    function initSlider() {
+        const slides = document.querySelectorAll('.ad-slide-item');
+        const dots = document.querySelectorAll('.slider-dot');
+        const track = document.getElementById('adsTrack');
+        if(!track || slides.length === 0) return;
+
+        function updateSlider() {
+            track.style.transform = `translateX(${currentSlideIndex * 100}%)`;
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentSlideIndex);
+            });
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            updateSlider();
+        }
+
+        window.currentSlide = function(index) {
+            currentSlideIndex = index;
+            updateSlider();
+        };
+
+        slideInterval = setInterval(nextSlide, 4000);
+
+        const adsContainer = document.getElementById('adsSlider');
+        if(adsContainer) {
+            adsContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            adsContainer.addEventListener('mouseleave', () => slideInterval = setInterval(nextSlide, 4000));
+        }
     }
 
-    function nextSlide() {
-        if(slides.length === 0) return;
-        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-        updateSlider();
-    }
-
-    window.currentSlide = function(index) {
-        currentSlideIndex = index;
-        updateSlider();
-    };
-
-    let slideInterval = setInterval(nextSlide, 4000);
-
-    const adsContainer = document.getElementById('adsSlider');
-    if(adsContainer) {
-        adsContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
-        adsContainer.addEventListener('mouseleave', () => slideInterval = setInterval(nextSlide, 4000));
-    }
-
-    // --- نظام عداد المشاهدات والتحميلات للكتب (متزامن مع Firebase Firestore) ---
+    // --- نظام عداد المشاهدات والتحميلات للكتب ---
     let unsubscribeBookSnapshot = null;
 
     window.openBookDetail = function(bookId, title, image, fileUrl) {
@@ -68,6 +71,7 @@ const db = getFirestore(app);
 
         const bookRef = doc(db, "books", bookId);
 
+        // تحديث المشاهدات مرة واحدة لكل جلسة
         if (!sessionStorage.getItem('viewed_book_' + bookId)) {
             getDoc(bookRef).then((docSnap) => {
                 if (!docSnap.exists()) {
@@ -102,61 +106,168 @@ const db = getFirestore(app);
             console.error("خطأ في مزامنة إحصائيات الكتاب:", error);
         });
 
+        // ربط حدث التحميل بشكل نظيف دون تكرار الاستنساخ
         if(downloadBtn) {
-            const newBtn = downloadBtn.cloneNode(true);
-            downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
-            
-            newBtn.addEventListener('click', () => {
+            downloadBtn.onclick = function() {
                 setDoc(bookRef, { downloads: increment(1) }, { merge: true }).catch(console.error);
-            });
+            };
         }
     };
 
-    // --- قاعدة بيانات الأساتذة الشاملة لجميع المواد (24 أستاذ) متزامنة مع Firestore ---
+    // --- قاعدة بيانات الأساتذة الشاملة ---
     const teachersData = {
         arabic: [
-            { id: 'aqeel', name: 'الأستاذ عقيل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/JM08nuw.jpeg', page: 'teacher-arabic' },
-            { id: 'hussein', name: 'الأستاذ حسين عبيده', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/ftflwlv.jpeg', page: 'teacher-arabic' },
-            { id: 'hamza', name: 'الاستاذ حمزه الجابري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/qJPcFAY.jpeg', page: 'teacher-arabic' },
-            { id: 'rafal_zubaidi', name: 'الست رفل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/9R3gdou.jpeg', page: 'teacher-arabic' },
-            { id: 'hisham_maamouri', name: 'الاستاذ هشام المعموري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/Pvm8zbd.jpeg', page: 'teacher-arabic' }
+            { id: 'aqeel', name: 'الأستاذ عقيل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/JM08nuw.jpeg' },
+            { id: 'hussein', name: 'الأستاذ حسين عبيده', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/ftflwlv.jpeg' },
+            { id: 'hamza', name: 'الاستاذ حمزه الجابري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/qJPcFAY.jpeg' },
+            { id: 'rafal_zubaidi', name: 'الست رفل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/9R3gdou.jpeg' },
+            { id: 'hisham_maamouri', name: 'الاستاذ هشام المعموري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/Pvm8zbd.jpeg' }
         ],
         islamic: [
-            { id: 'khaled_hyali', name: 'الأستاذ خالد الحيالي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/I76Zdb4.jpeg', page: 'teacher-islamic' },
-            { id: 'sajid_akili', name: 'الأستاذ ساجد العكيلي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/GqsUdZW.jpeg', page: 'teacher-islamic' }
+            { id: 'khaled_hyali', name: 'الأستاذ خالد الحيالي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/I76Zdb4.jpeg' },
+            { id: 'sajid_akili', name: 'الأستاذ ساجد العكيلي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/GqsUdZW.jpeg' }
         ],
         math: [
-            { id: 'haidar_abdulaima', name: 'الأستاذ حيدر عبد الائمة', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/yxbFxrp.jpeg', page: 'teacher-math' },
-            { id: 'haidar_waleed', name: 'الأستاذ حيدر وليد', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/xZIRMx5.jpeg', page: 'teacher-math' },
-            { id: 'mohammed_qasim', name: 'الأستاذ محمد قاسم', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/acExwFZ.jpeg', page: 'teacher-math' }
+            { id: 'haidar_abdulaima', name: 'الأستاذ حيدر عبد الائمة', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/yxbFxrp.jpeg' },
+            { id: 'haidar_waleed', name: 'الأستاذ حيدر وليد', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/xZIRMx5.jpeg' },
+            { id: 'mohammed_qasim', name: 'الأستاذ محمد قاسم', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/acExwFZ.jpeg' }
         ],
         english: [
-            { id: 'mohammed_obaidi', name: 'الأستاذ محمد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/zUCDQyq.jpeg', page: 'teacher-english' },
-            { id: 'sajjad_obaidi', name: 'الأستاذ سجاد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/bl68sCC.jpeg', page: 'teacher-english' },
-            { id: 'azal_salwan', name: 'الست أزل سلوان', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/RkxAMUv.jpeg', page: 'teacher-english' }
+            { id: 'mohammed_obaidi', name: 'الأستاذ محمد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/zUCDQyq.jpeg' },
+            { id: 'sajjad_obaidi', name: 'الأستاذ سجاد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/bl68sCC.jpeg' },
+            { id: 'azal_salwan', name: 'الست أزل سلوان', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/RkxAMUv.jpeg' }
         ],
         biology: [
-            { id: 'salem_mansour', name: 'الأستاذ سالم ال منصور', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/ryqitAT.jpeg', page: 'teacher-biology' },
-            { id: 'mustafa_hafiz', name: 'الأستاذ مصطفى حافظ', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/23ZakX0.jpeg', page: 'teacher-biology' },
-            { id: 'hassan_fallah', name: 'الأستاذ حسن فلاح', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/jvv7wCd.jpeg', page: 'teacher-biology' },
-            { id: 'jaafar_hasani', name: 'الأستاذ جعفر الحسني', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/uRHxEFM.jpeg', page: 'teacher-biology' }
+            { id: 'salem_mansour', name: 'الأستاذ سالم ال منصور', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/ryqitAT.jpeg' },
+            { id: 'mustafa_hafiz', name: 'الأستاذ مصطفى حافظ', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/23ZakX0.jpeg' },
+            { id: 'hassan_fallah', name: 'الأستاذ حسن فلاح', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/jvv7wCd.jpeg' },
+            { id: 'jaafar_hasani', name: 'الأستاذ جعفر الحسني', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/uRHxEFM.jpeg' }
         ],
         chemistry: [
-            { id: 'fadel_hashimi', name: 'الأستاذ فاضل الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/hFKC4G6.jpeg', page: 'teacher-chemistry' },
-            { id: 'hussein_hashimi', name: 'الأستاذ حسين الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/oS6ujqX.jpeg', page: 'teacher-chemistry' },
-            { id: 'haidar_abbas', name: 'الأستاذ حيدر عباس', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/umkMkls.jpeg', page: 'teacher-chemistry' },
-            { id: 'hashem_gharbawi', name: 'الأستاذ هاشم الغرباوي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/y47x9Gy.jpeg', page: 'teacher-chemistry' },
-            { id: 'muhannad_sudani', name: 'الأستاذ مهند السوداني', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/Y8yNcaf.jpeg', page: 'teacher-chemistry' }
+            { id: 'fadel_hashimi', name: 'الأستاذ فاضل الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/hFKC4G6.jpeg' },
+            { id: 'hussein_hashimi', name: 'الأستاذ حسين الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/oS6ujqX.jpeg' },
+            { id: 'haidar_abbas', name: 'الأستاذ حيدر عباس', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/umkMkls.jpeg' },
+            { id: 'hashem_gharbawi', name: 'الأستاذ هاشم الغرباوي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/y47x9Gy.jpeg' },
+            { id: 'muhannad_sudani', name: 'الأستاذ مهند السوداني', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/Y8yNcaf.jpeg' }
         ],
         physics: [
-            { id: 'hussein_mohammed', name: 'الأستاذ حسين محمد', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/tgoLB13.jpeg', page: 'teacher-physics' },
-            { id: 'moayad_saleem', name: 'الأستاذ مؤيد سليم', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/6h9mMeF.jpeg', page: 'teacher-physics' }
+            { id: 'hussein_mohammed', name: 'الأستاذ حسين محمد', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/tgoLB13.jpeg' },
+            { id: 'moayad_saleem', name: 'الأستاذ مؤيد سليم', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/6h9mMeF.jpeg' }
         ]
     };
 
-    // مصفوفة البحث الشاملة للأساتذة والمحتوى
+    const categoriesList = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
+
+    // --- مزامنة أصوات الأساتذة بكفاءة عالية (مستمع واحد لمجموعة teachers) ---
+    function initFirebaseTeacherListeners() {
+        // تهيئة البيانات الافتراضية محلياً أولاً
+        categoriesList.forEach(cat => {
+            if (teachersData[cat]) {
+                teachersData[cat].forEach(t => {
+                    t.votes = 0;
+                    t.userVote = localStorage.getItem('voted_' + t.id) === 'true';
+                });
+            }
+        });
+
+        // جلب جميع الأصوات دفعة واحدة ومزامنتها لحظياً
+        onSnapshot(collection(db, "teachers"), (snapshot) => {
+            const votesMap = {};
+            snapshot.forEach(docSnap => {
+                votesMap[docSnap.id] = docSnap.data().votes || 0;
+            });
+
+            categoriesList.forEach(cat => {
+                if (!teachersData[cat]) return;
+                teachersData[cat].forEach(teacher => {
+                    teacher.votes = votesMap[teacher.id] !== undefined ? votesMap[teacher.id] : 0;
+                });
+                renderCategoryTeachers(cat);
+            });
+        }, (error) => {
+            console.error("خطأ في مزامنة أصوات المدرسين:", error);
+        });
+    }
+
+    function renderCategoryTeachers(categoryKey) {
+        const container = document.getElementById(categoryKey + 'TeachersList') || document.querySelector('#teacher-' + categoryKey + ' .books-list-container');
+        if (!container || !teachersData[categoryKey]) return;
+
+        teachersData[categoryKey].sort((a, b) => b.votes - a.votes);
+        container.innerHTML = '';
+
+        teachersData[categoryKey].forEach((teacher, index) => {
+            let rankText = `المرتبة #${index + 1}`;
+            let rankClass = 'rank-third';
+
+            if (index === 0) {
+                rankText = `👑 الأول على المادة`;
+                rankClass = 'rank-first';
+            } else if (index === 1) {
+                rankText = `⭐ المرتبة #2`;
+                rankClass = 'rank-second';
+            } else if (index === 2) {
+                rankText = `🥉 المرتبة #3`;
+                rankClass = 'rank-third';
+            }
+
+            const card = document.createElement('div');
+            card.className = 'teacher-card-item book-card-item';
+            card.setAttribute('data-id', teacher.id);
+            card.innerHTML = `
+                <div class="teacher-info-side">
+                    <div class="teacher-rank-badge ${rankClass}">${rankText}</div>
+                    <div class="teacher-main-title">${teacher.name}</div>
+                    <div class="teacher-meta-list" style="margin-top: 6px;">
+                        <div class="teacher-meta-row"><span>المادة:</span> <strong>${teacher.subject}</strong></div>
+                        <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
+                    </div>
+                    <div class="voting-actions-row" style="margin-top: 10px;">
+                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" id="vote-btn-${teacher.id}" onclick="voteTeacher('${teacher.id}')" style="${teacher.userVote ? 'background: #059669;' : ''}">
+                            👍 <span id="vote-text-${teacher.id}">${teacher.userVote ? 'تم التصويت ✓ (إلغاء)' : 'تصويت'}</span> <span class="vote-count" id="votes-count-${teacher.id}">(${teacher.votes})</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="teacher-avatar-side">
+                    <img src="${teacher.img}" alt="${teacher.name}" class="teacher-avatar-img">
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    window.voteTeacher = async function(teacherId) {
+        let targetTeacher = null;
+        for (let cat of categoriesList) {
+            const found = teachersData[cat].find(t => t.id === teacherId);
+            if (found) {
+                targetTeacher = found;
+                break;
+            }
+        }
+        if (!targetTeacher) return;
+
+        const hasVoted = localStorage.getItem('voted_' + teacherId) === 'true';
+        const teacherRef = doc(db, "teachers", teacherId);
+
+        try {
+            if (hasVoted) {
+                await setDoc(teacherRef, { votes: increment(-1) }, { merge: true });
+                localStorage.removeItem('voted_' + teacherId);
+                targetTeacher.userVote = false;
+            } else {
+                await setDoc(teacherRef, { votes: increment(1) }, { merge: true });
+                localStorage.setItem('voted_' + teacherId, 'true');
+                targetTeacher.userVote = true;
+            }
+        } catch (error) {
+            console.error("خطأ في تحديث التصويت:", error);
+            alert("فشل تحديث الصوت، تحقق من الاتصال بالإنترنت.");
+        }
+    };
+
+    // --- نظام البحث الشامل (مع تصحيح خطأ flexDirection) ---
     const searchIndex = [
-        // الأساتذة
         { title: "الأستاذ عقيل الزبيدي", category: "اللغة العربية", image: "https://i.imgur.com/JM08nuw.jpeg", page: "teacher-arabic" },
         { title: "الأستاذ حسين عبيده", category: "اللغة العربية", image: "https://i.imgur.com/ftflwlv.jpeg", page: "teacher-arabic" },
         { title: "الاستاذ حمزه الجابري", category: "اللغة العربية", image: "https://i.imgur.com/qJPcFAY.jpeg", page: "teacher-arabic" },
@@ -176,13 +287,11 @@ const db = getFirestore(app);
         { title: "الأستاذ جعفر الحسني", category: "الأحياء", image: "https://i.imgur.com/uRHxEFM.jpeg", page: "teacher-biology" },
         { title: "الأستاذ فاضل الهاشمي", category: "الكيمياء", image: "https://i.imgur.com/hFKC4G6.jpeg", page: "teacher-chemistry" },
         { title: "الأستاذ حسين الهاشمي", category: "الكيمياء", image: "https://i.imgur.com/oS6ujqX.jpeg", page: "teacher-chemistry" },
-        { title: "الأستاذ حيدر عباس", category: "الكيمياء", categoryName: "الكيمياء", image: "https://i.imgur.com/umkMkls.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ حيدر عباس", category: "الكيمياء", image: "https://i.imgur.com/umkMkls.jpeg", page: "teacher-chemistry" },
         { title: "الأستاذ هاشم الغرباوي", category: "الكيمياء", image: "https://i.imgur.com/y47x9Gy.jpeg", page: "teacher-chemistry" },
         { title: "الأستاذ مهند السوداني", category: "الكيمياء", image: "https://i.imgur.com/Y8yNcaf.jpeg", page: "teacher-chemistry" },
         { title: "الأستاذ حسين محمد", category: "الفيزياء", image: "https://i.imgur.com/tgoLB13.jpeg", page: "teacher-physics" },
         { title: "الأستاذ مؤيد سليم", category: "الفيزياء", image: "https://i.imgur.com/6h9mMeF.jpeg", page: "teacher-physics" },
-        
-        // المحتوى والأقسام
         { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
         { title: "كتاب الفيزياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "books.html" },
         { title: "ملزمة الرياضيات الاستاذ حيدر وليد", category: "الملازم", image: "https://i.imgur.com/IcszMVF.jpeg", page: "malazm.html" },
@@ -230,11 +339,12 @@ const db = getFirestore(app);
             return;
         }
 
+        // تم تصحيح flexDirection إلى flex-direction
         container.innerHTML = results.map(r => `
             <div class="search-result-item" onclick="${r.page.endsWith('.html') ? `window.location.href='${r.page}'` : `showPage('${r.page}'); closeSearchModal();`}">
                 <div class="search-result-content-wrap" style="display: flex; align-items: center; gap: 12px;">
                     <img src="${r.image}" class="search-result-thumb" alt="${r.title}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
-                    <div class="search-result-info" style="display: flex; flexDirection: column;">
+                    <div class="search-result-info" style="display: flex; flex-direction: column;">
                         <span class="search-result-title" style="font-weight: 700;">${r.title}</span>
                         <span class="search-result-category" style="font-size: 0.75rem; color: #64748b;">${r.category}</span>
                     </div>
@@ -244,166 +354,7 @@ const db = getFirestore(app);
         `).join('');
     };
 
-    // --- تهيئة مستمعي التقييمات والتصويتات للأساتذة في الوقت الفعلي عبر Firestore ---
-    const categoriesList = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
-
-    function initFirebaseTeacherListeners() {
-        categoriesList.forEach(cat => {
-            if (!teachersData[cat]) return;
-            
-            teachersData[cat].forEach(teacher => {
-                teacher.votes = 0;
-                teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
-
-                onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        teacher.votes = typeof data.votes === 'number' ? data.votes : 0;
-                    } else {
-                        setDoc(doc(db, "teachers", teacher.id), { votes: 0 }, { merge: true }).catch(console.error);
-                    }
-                    renderCategoryTeachers(cat);
-                }, (error) => {
-                    console.error("خطأ في مزامنة أصوات المدرس:", error);
-                });
-            });
-        });
-    }
-
-    function renderCategoryTeachers(categoryKey) {
-        const container = document.getElementById(categoryKey + 'TeachersList') || document.querySelector('#teacher-' + categoryKey + ' .books-list-container');
-        if (!container || !teachersData[categoryKey]) return;
-
-        const cardPositions = {};
-        container.querySelectorAll('.teacher-card-item').forEach(card => {
-            const id = card.getAttribute('data-id');
-            if (id) cardPositions[id] = card.getBoundingClientRect();
-        });
-
-        teachersData[categoryKey].sort((a, b) => b.votes - a.votes);
-        container.innerHTML = '';
-
-        teachersData[categoryKey].forEach((teacher, index) => {
-            let rankText = `المرتبة #${index + 1}`;
-            let rankClass = 'rank-third';
-
-            if (index === 0) {
-                rankText = `👑 الأول على المادة`;
-                rankClass = 'rank-first';
-            } else if (index === 1) {
-                rankText = `⭐ المرتبة #2`;
-                rankClass = 'rank-second';
-            } else if (index === 2) {
-                rankText = `🥉 المرتبة #3`;
-                rankClass = 'rank-third';
-            }
-
-            const card = document.createElement('div');
-            card.className = 'teacher-card-item book-card-item';
-            card.setAttribute('data-id', teacher.id);
-            card.setAttribute('data-teacher-id', teacher.id);
-            card.innerHTML = `
-                <div class="teacher-info-side">
-                    <div class="teacher-rank-badge ${rankClass}">${rankText}</div>
-                    <div class="teacher-main-title">${teacher.name}</div>
-                    <div class="teacher-meta-list" style="margin-top: 6px;">
-                        <div class="teacher-meta-row"><span>المادة:</span> <strong>${teacher.subject}</strong></div>
-                        <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
-                    </div>
-                    <div class="voting-actions-row" style="margin-top: 10px;">
-                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" id="vote-btn-${teacher.id}" onclick="voteTeacher('${teacher.id}')" style="${teacher.userVote ? 'background: #059669;' : ''}">
-                            👍 <span id="vote-text-${teacher.id}">${teacher.userVote ? 'تم التصويت ✓ (إلغاء)' : 'تصويت'}</span> <span class="vote-count" id="votes-count-${teacher.id}">(${teacher.votes})</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="teacher-avatar-side">
-                    <img src="${teacher.img}" alt="${teacher.name}" class="teacher-avatar-img">
-                </div>
-            `;
-            container.appendChild(card);
-
-            const oldPos = cardPositions[teacher.id];
-            if (oldPos) {
-                const newPos = card.getBoundingClientRect();
-                const deltaY = oldPos.top - newPos.top;
-                if (deltaY !== 0) {
-                    card.style.transform = `translateY(${deltaY}px)`;
-                    card.style.transition = 'none';
-                    requestAnimationFrame(() => {
-                        card.style.transform = '';
-                        card.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-                    });
-                }
-            }
-        });
-    }
-
-    window.voteTeacher = async function(teacherId) {
-        let targetTeacher = null;
-        let foundCategory = '';
-        for (let cat of categoriesList) {
-            const found = teachersData[cat].find(t => t.id === teacherId);
-            if (found) {
-                targetTeacher = found;
-                foundCategory = cat;
-                break;
-            }
-        }
-        if (!targetTeacher) return;
-
-        const hasVoted = localStorage.getItem('voted_' + teacherId) === 'true';
-        const teacherRef = doc(db, "teachers", teacherId);
-
-        try {
-            if (hasVoted) {
-                await setDoc(teacherRef, { votes: increment(-1) }, { merge: true });
-                localStorage.removeItem('voted_' + teacherId);
-                targetTeacher.userVote = false;
-            } else {
-                await setDoc(teacherRef, { votes: increment(1) }, { merge: true });
-                localStorage.setItem('voted_' + teacherId, 'true');
-                targetTeacher.userVote = true;
-            }
-            renderCategoryTeachers(foundCategory);
-        } catch (error) {
-            console.error("خطأ في تحديث التصويت:", error);
-            alert("فشل تحديث الصوت، تحقق من الاتصال بالإنترنت.");
-        }
-    };
-
-    window.filterItems = function(sectionType, subjectName, element) {
-        let containerId = '';
-        if(sectionType === 'books') containerId = 'booksListContainer';
-        else if(sectionType === 'mlazem') containerId = 'mlazemListContainer';
-        else if(sectionType === 'copies') containerId = 'copiesListContainer';
-        else if(sectionType === 'courses') containerId = 'coursesListContainer';
-
-        const container = document.getElementById(containerId);
-        if(!container) return;
-
-        if(element) {
-            const parentBar = element.parentElement;
-            if(parentBar) {
-                parentBar.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
-                element.classList.add('active');
-            }
-        }
-
-        const items = container.querySelectorAll('.book-card-item');
-        items.forEach(item => {
-            const itemSubject = item.getAttribute('data-subject');
-            if(subjectName === 'all' || itemSubject === subjectName) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        initFirebaseTeacherListeners();
-    });
-
+    // --- التنقل بين الصفحات ---
     let pageHistory = ['home'];
     
     window.showPage = function(id, parentId=null) {
@@ -482,6 +433,7 @@ const db = getFirestore(app);
         if(chatWindow) chatWindow.classList.toggle('active');
     };
 
+    // --- مساعد الذكاء الاصطناعي الذكي ---
     function getSmartAIResponse(userText) {
         const rawText = userText.trim();
         const text = rawText.toLowerCase();
@@ -544,5 +496,11 @@ const db = getFirestore(app);
     window.handleAIPress = function(e) {
         if(e.key === 'Enter') window.sendAIMessage();
     };
+
+    // تشغيل التهيئة عند اكتمال تحميل الـ DOM
+    document.addEventListener('DOMContentLoaded', () => {
+        initSlider();
+        initFirebaseTeacherListeners();
+    });
 
 })();
