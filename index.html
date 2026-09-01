@@ -77,6 +77,20 @@
 </div>
 <div class="slider-dots" id="sliderDots"><span class="slider-dot active" onclick="currentSlide(0)"></span><span class="slider-dot" onclick="currentSlide(1)"></span><span class="slider-dot" onclick="currentSlide(2)"></span></div>
 </div>
+
+<!-- قسم التصويت التفاعلي المضاف -->
+<div class="voting-section" style="background: var(--card-bg, #fff); padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px solid #e2e8f0;">
+    <h3 style="margin-bottom: 15px; font-size: 1.2rem; color: #1e293b;">📊 تصويت أفضل مدرس للمادة</h3>
+    <div id="votingOptionsContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="vote-card" data-teacher-id="teacher1" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 700; color: #1e293b;">الأستاذ حيدر وليد (رياضيات)</span>
+            <button id="vote-btn-teacher1" onclick="voteTeacher('math', 'teacher1')" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal', sans-serif; font-weight: 700;">
+                <span id="vote-text-teacher1">تصويت</span> (<span id="votes-count-teacher1">0</span>)
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="page-header"><h2 class="page-title">مرحباً بك في منصتك الاحترافية</h2><p class="page-subtitle">اختر القسم الذي تريد تصفحه والبدء في دراستك</p></div>
 <div class="grid">
 <div class="card-btn" onclick="window.location.href='results.html'"><span class="card-badge">النتائج الوزارية</span><div class="card-icon-wrapper">🏆</div><div><div class="card-title">نتائج السادس</div><div class="card-desc">عرض وتحميل نتائج الامتحانات الوزارية لجميع المحافظات</div></div><div class="btn-action"><span>عرض النتائج</span><span>➔</span></div></div>
@@ -127,7 +141,24 @@
 </div>
 </div>
 </div>
+
+<!-- مكتبات Firebase (الإصدار التوافقي Compat) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <script>
+// إعدادات مشروعك المربوط بـ Firebase
+const firebaseConfig = {
+    apiKey: "مفتاح_الـ_API_الخاص بك",
+    authDomain: "sadshelp-e1624.firebaseapp.com",
+    databaseURL: "رابط_قاعدة_البيانات",
+    projectId: "sadshelp-e1624",
+    storageBucket: "sadshelp-e1624.appspot.com",
+    messagingSenderId: "رقم_المُرسل",
+    appId: "معرف_التطبيق"
+};
+firebase.initializeApp(firebaseConfig);
+
 let pageHistory = ['home'];
 let slideIndex = 0;
 
@@ -251,6 +282,56 @@ function showSlide(n) {
     if (dots[slideIndex]) dots[slideIndex].classList.add('active');
 }
 
+// دالة التعامل مع التصويت المباشر وحفظ حالة المستخدم لمنع التكرار
+function voteTeacher(category, teacherId) {
+    let userVote = localStorage.getItem('user_vote_' + category);
+    let voteRef = firebase.database().ref('votes/' + category + '/' + teacherId);
+
+    voteRef.transaction(currentVotes => {
+        currentVotes = currentVotes || 0;
+        if (userVote === teacherId) {
+            localStorage.removeItem('user_vote_' + category);
+            return Math.max(0, currentVotes - 1);
+        } else {
+            if (userVote) {
+                let prevVoteRef = firebase.database().ref('votes/' + category + '/' + userVote);
+                prevVoteRef.transaction(prevCount => Math.max(0, (prevCount || 1) - 1));
+            }
+            localStorage.setItem('user_vote_' + category, teacherId);
+            return currentVotes + 1;
+        }
+    });
+}
+
+// دالة مزامنة الأصوات لحظياً وتحديث الواجهة تلقائياً للجميع
+function initRealtimeVotes() {
+    let category = 'math';
+    let categoryRef = firebase.database().ref('votes/' + category);
+    
+    categoryRef.on('value', snapshot => {
+        let data = snapshot.val() || {};
+        let userVote = localStorage.getItem('user_vote_' + category);
+
+        let tId = 'teacher1';
+        let votes = data[tId] || 0;
+        
+        let countEl = document.getElementById('votes-count-' + tId);
+        let btnEl = document.getElementById('vote-btn-' + tId);
+        let textEl = document.getElementById('vote-text-' + tId);
+
+        if (countEl) countEl.innerText = votes;
+        if (btnEl && textEl) {
+            if (userVote === tId) {
+                btnEl.style.background = '#059669';
+                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
+            } else {
+                btnEl.style.background = '#10b981';
+                textEl.innerText = 'تصويت';
+            }
+        }
+    });
+}
+
 // قاعدة بيانات شاملة للبحث تشمل الكتب المنهجية، الملازم، الدورات الإلكترونية، والنسخ الوزارية
 const searchIndex = [
     { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
@@ -317,6 +398,10 @@ function handleSearchInput(e) {
         </div>
     `).join('');
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    initRealtimeVotes();
+});
 </script>
 </body>
 </html>
