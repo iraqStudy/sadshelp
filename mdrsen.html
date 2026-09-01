@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شيرادله السادس - نخبة المدرسين</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<!-- استدعاء مكتبة Firebase (Realtime Database) لجعل التصويتات حقيقية ومتزامنة -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<style>
+@keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.vote-action-btn { background: #10b981; color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s, transform 0.1s; font-size: 0.9rem; }
+.vote-action-btn:hover { background: #059669; }
+.vote-action-btn:active { transform: scale(0.96); }
+.search-toggle-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; color: var(--text-color, #1e293b); transition: background 0.2s; }
+.search-toggle-btn:hover { background: rgba(0,0,0,0.05); }
+.search-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: flex-start; padding-top: 80px; animation: modalPop 0.2s ease; }
+.search-modal-box { background: var(--card-bg, #fff); width: 90%; max-width: 600px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; max-height: 80vh; border: 1px solid #e2e8f0; }
+.search-input-wrapper { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; gap: 12px; }
+.search-modal-input { flex: 1; border: none; background: transparent; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; color: var(--text-color, #1e293b); outline: none; direction: rtl; }
+.search-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); padding: 0 5px; }
+.search-results-container { overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 400px; }
+.search-result-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: #fff; border: 1px solid #edf2f7; text-decoration: none; color: inherit; transition: all 0.2s; cursor: pointer; }
+.search-result-item:hover { background: #f1f5f9; border-color: #cbd5e1; transform: translateX(-3px); }
+.search-result-content-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+.search-result-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid #e2e8f0; }
+.search-result-info { display: flex; flex-direction: column; gap: 2px; }
+.search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
+.search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
+.search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
+.page-view { display: none; }
+.page-view.active { display: block; }
+</style>
+</head>
+<body>
+<nav class="side-nav-bar"><div class="side-nav-links">
+<div class="side-nav-item" onclick="window.location.href='index.html'" data-page="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>الرئيسية</span></div>
+<div class="side-nav-item active" onclick="showPage('teachers-page')" data-page="teachers-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span>المدرسين</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html#chats'" data-page="chats-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg><span>سوالف</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html'" data-page="notifications-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>الإشعارات</span></div>
+</div></nav>
+<header>
+<div class="logo-container" onclick="window.location.href='index.html'">
+<div class="logo-icon"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;"></div>
+<div class="logo-text"><h1>شيرادله</h1><h2>السادس</h2></div>
+</div>
+<div class="header-actions">
+<button class="search-toggle-btn" onclick="openSearchModal()" title="بحث"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+<button class="menu-toggle" onclick="toggleMenu()" title="القائمة"><span></span><span></span><span></span></button>
+</div>
+</header>
+<div id="navOverlay" class="nav-overlay" onclick="closeMenu(event)"><div class="nav-drawer" onclick="event.stopPropagation()">
+<div>
+<div class="drawer-header">
+<div class="drawer-brand"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;"><span style="font-weight:900; font-size:1.1rem;">شيرادله السادس</span></div>
+<button class="close-drawer" onclick="toggleMenu()">&times;</button>
+</div>
+<div class="drawer-menu-list">
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>🏠</span> الصفحة الرئيسية</div>
+<div onclick="showPage('teachers-page'); toggleMenu();" class="drawer-link"><span>👨‍🏫</span> قائمة المدرسين</div>
+<div onclick="window.location.href='books.html'; toggleMenu();" class="drawer-link"><span>📚</span> الكتب المنهجية</div>
+<div onclick="window.location.href='malazm.html'; toggleMenu();" class="drawer-link"><span>📖</span> الملازم</div>
+<div onclick="window.location.href='newiraq.html'; toggleMenu();" class="drawer-link"><span>📋</span> النسخ الوزارية</div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>💬</span> سوالف</div>
+<div onclick="window.location.href='videos.html'; toggleMenu();" class="drawer-link"><span>💻</span> الدورات الإلكترونية</div>
+<div onclick="window.location.href='exams.html'; toggleMenu();" class="drawer-link"><span>📝</span> الامتحانات الوزارية</div>
+</div>
+</div>
+<div><div class="drawer-footer">جميع الحقوق محفوظة © منصة شيرادله السادس</div></div>
+</div></div>
+<main>
+<div id="teachers-page" class="page-view active" data-parent="home">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="window.location.href='index.html'"><span>➔</span> رجوع للرئيسية</button></div>
+<div class="page-header"><h2 class="page-title">👨‍🏫 اختر افضل مدرس لعام 2027</h2><p class="page-subtitle">اختر المادة لعرض نخبة الأساتذة وتصنيفهم حسب التقييم</p></div>
+<div class="grid">
+<div class="card-btn" onclick="showPage('teacher-arabic')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">📖</div><div class="card-title">مدرسين اللغه العربيه</div><div class="card-desc">تصفح أفضل أساتذة وملازم اللغة العربية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-islamic')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">📖</div><div class="card-title">مدرسين الاسلاميه</div><div class="card-desc">تصفح أفضل أساتذة وملازم التربية الإسلامية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-english')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">🔤</div><div class="card-title">مدرسين الإنكليزي</div><div class="card-desc">تصفح أفضل أساتذة وملازم اللغة الإنجليزية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-math')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">📐</div><div class="card-title">مدرسين الرياضيات</div><div class="card-desc">تصفح أفضل أساتذة وملازم الرياضيات للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-biology')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">🧬</div><div class="card-title">مدرسين الأحياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الأحياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-chemistry')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">🧪</div><div class="card-title">مدرسين الكيمياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الكيمياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+<div class="card-btn" onclick="showPage('teacher-physics')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">⚡</div><div class="card-title">مدرسين الفيزياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الفيزياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
+</div></div>
+
+<div id="teacher-arabic" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">📖 مدرسين اللغه العربيه</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="aqeel-zubaidi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ عقيل الزبيدي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-aqeel-zubaidi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-aqeel-zubaidi" onclick="voteTeacher('arabic', 'aqeel-zubaidi')"><span id="vote-text-aqeel-zubaidi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/JM08nuw.jpeg" alt="عقيل الزبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hussein-obaida">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين عبيده</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-obaida">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-obaida" onclick="voteTeacher('arabic', 'hussein-obaida')"><span id="vote-text-hussein-obaida">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/ftflwlv.jpeg" alt="حسين عبيده" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hamza-aljabri">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الاستاذ حمزه الجابري</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hamza-aljabri">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hamza-aljabri" onclick="voteTeacher('arabic', 'hamza-aljabri')"><span id="vote-text-hamza-aljabri">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/qJPcFAY.jpeg" alt="حمزه الجابري" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="rafal-alzubaidi">
+<div class="book-info-side"><span class="card-badge">مدرسة متميزة</span><h3 class="book-main-title">الست رفل الزبيدي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-rafal-alzubaidi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-rafal-alzubaidi" onclick="voteTeacher('arabic', 'rafal-alzubaidi')"><span id="vote-text-rafal-alzubaidi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/9R3gdou.jpeg" alt="رفل الزبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hisham-almaamouri">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الاستاذ هشام المعموري</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hisham-almaamouri">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hisham-almaamouri" onclick="voteTeacher('arabic', 'hisham-almaamouri')"><span id="vote-text-hisham-almaamouri">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/Pvm8zbd.jpeg" alt="هشام المعموري" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-islamic" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">📖 مدرسين الاسلاميه</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="khaled-hayali">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ خالد الحيالي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>التربية الإسلامية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-khaled-hayali">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-khaled-hayali" onclick="voteTeacher('islamic', 'khaled-hayali')"><span id="vote-text-khaled-hayali">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/I76Zdb4.jpeg" alt="خالد الحيالي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="sajid-akili">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ ساجد العكيلي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>التربية الإسلامية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-sajid-akili">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-sajid-akili" onclick="voteTeacher('islamic', 'sajid-akili')"><span id="vote-text-sajid-akili">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/GqsUdZW.jpeg" alt="ساجد العكيلي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-math" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">📐 مدرسين الرياضيات</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="haider-abdulaima">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر عبد الائمة</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-abdulaima">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-abdulaima" onclick="voteTeacher('math', 'haider-abdulaima')"><span id="vote-text-haider-abdulaima">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/yxbFxrp.jpeg" alt="حيدر عبد الائمة" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="haider-waleed">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر وليد</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-waleed">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-waleed" onclick="voteTeacher('math', 'haider-waleed')"><span id="vote-text-haider-waleed">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/xZIRMx5.jpeg" alt="حيدر وليد" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="mohammed-qassim">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ محمد قاسم</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mohammed-qassim">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mohammed-qassim" onclick="voteTeacher('math', 'mohammed-qassim')"><span id="vote-text-mohammed-qassim">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/acExwFZ.jpeg" alt="محمد قاسم" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-english" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">🔤 مدرسين الإنكليزي</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="mohammed-alobaidi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ محمد العبيدي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mohammed-alobaidi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mohammed-alobaidi" onclick="voteTeacher('english', 'mohammed-alobaidi')"><span id="vote-text-mohammed-alobaidi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/zUCDQyq.jpeg" alt="محمد العبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="sajjad-alobaidi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ سجاد العبيدي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-sajjad-alobaidi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-sajjad-alobaidi" onclick="voteTeacher('english', 'sajjad-alobaidi')"><span id="vote-text-sajjad-alobaidi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/bl68sCC.jpeg" alt="سجاد العبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="azal-salwan">
+<div class="book-info-side"><span class="card-badge">مدرسة متميزة</span><h3 class="book-main-title">الست أزل سلوان</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-azal-salwan">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-azal-salwan" onclick="voteTeacher('english', 'azal-salwan')"><span id="vote-text-azal-salwan">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/RkxAMUv.jpeg" alt="أزل سلوان" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-biology" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">🧬 مدرسين الأحياء</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="salem-almansoor">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ سالم ال منصور</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-salem-almansoor">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-salem-almansoor" onclick="voteTeacher('biology', 'salem-almansoor')"><span id="vote-text-salem-almansoor">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/ryqitAT.jpeg" alt="سالم ال منصور" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="mustafa-hafiz">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مصطفى حافظ</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mustafa-hafiz">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mustafa-hafiz" onclick="voteTeacher('biology', 'mustafa-hafiz')"><span id="vote-text-mustafa-hafiz">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/23ZakX0.jpeg" alt="مصطفى حافظ" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hassan-fallah">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسن فلاح</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hassan-fallah">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hassan-fallah" onclick="voteTeacher('biology', 'hassan-fallah')"><span id="vote-text-hassan-fallah">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/jvv7wCd.jpeg" alt="حسن فلاح" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="jaafar-alhasani">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ جعفر الحسني</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-jaafar-alhasani">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-jaafar-alhasani" onclick="voteTeacher('biology', 'jaafar-alhasani')"><span id="vote-text-jaafar-alhasani">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/uRHxEFM.jpeg" alt="جعفر الحسني" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-chemistry" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">🧪 مدرسين الكيمياء</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="fadel-alhashimi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ فاضل الهاشمي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-fadel-alhashimi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-fadel-alhashimi" onclick="voteTeacher('chemistry', 'fadel-alhashimi')"><span id="vote-text-fadel-alhashimi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/hFKC4G6.jpeg" alt="فاضل الهاشمي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hussein-alhashimi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين الهاشمي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-alhashimi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-alhashimi" onclick="voteTeacher('chemistry', 'hussein-alhashimi')"><span id="vote-text-hussein-alhashimi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/oS6ujqX.jpeg" alt="حسين الهاشمي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="haider-abbas">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر عباس</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-abbas">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-abbas" onclick="voteTeacher('chemistry', 'haider-abbas')"><span id="vote-text-haider-abbas">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/umkMkls.jpeg" alt="حيدر عباس" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="hashem-algharbawi">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ هاشم الغرباوي</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hashem-algharbawi">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hashem-algharbawi" onclick="voteTeacher('chemistry', 'hashem-algharbawi')"><span id="vote-text-hashem-algharbawi">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/y47x9Gy.jpeg" alt="هاشم الغرباوي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="muhannad-alsudani">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مهند السوداني</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-muhannad-alsudani">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-muhannad-alsudani" onclick="voteTeacher('chemistry', 'muhannad-alsudani')"><span id="vote-text-muhannad-alsudani">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/Y8yNcaf.jpeg" alt="مهند السوداني" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+
+<div id="teacher-physics" class="page-view" data-parent="teachers-page">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
+<div class="page-header"><h2 class="page-title">⚡ مدرسين الفيزياء</h2></div>
+<div class="books-list-container">
+<div class="book-card-item" data-teacher-id="hussein-mohammed">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين محمد</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-mohammed">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-mohammed" onclick="voteTeacher('physics', 'hussein-mohammed')"><span id="vote-text-hussein-mohammed">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/tgoLB13.jpeg" alt="حسين محمد" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+<div class="book-card-item" data-teacher-id="muayad-salim">
+<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مؤيد سليم</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-muayad-salim">0</strong></div></div>
+<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-muayad-salim" onclick="voteTeacher('physics', 'muayad-salim')"><span id="vote-text-muayad-salim">تصويت</span></button></div>
+</div>
+<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/6h9mMeF.jpeg" alt="مؤيد سليم" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
+</div>
+</div></div>
+</main>
+
+<div id="searchModal" class="search-modal-overlay">
+<div class="search-modal-box" onclick="event.stopPropagation()">
+<div class="search-input-wrapper">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="#64748b"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" id="searchInput" class="search-modal-input" placeholder="ابحث عن مدرس، مادة..." oninput="handleSearchInput(event)">
+<button class="search-close-btn" onclick="closeSearchModal()">&times;</button>
+</div>
+<div id="searchResultsContainer" class="search-results-container">
+<div class="search-no-results">اكتب اسم المدرس أو المادة للبحث...</div>
+</div>
+</div>
+</div>
+
+<script>
+// إعدادات Firebase (قم بوضع معلومات مشروعك هنا لربط التصويتات الحقيقية)
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let pageHistory = ['teachers-page'];
+
+function showPage(pageId) {
+    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.add('active');
+        if (pageHistory[pageHistory.length - 1] !== pageId) {
+            pageHistory.push(pageId);
+        }
+        window.scrollTo(0, 0);
+    }
+}
+
+function goBack() {
+    if (pageHistory.length > 1) {
+        pageHistory.pop();
+        const prevPage = pageHistory[pageHistory.length - 1];
+        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(prevPage);
+        if (target) {
+            target.classList.add('active');
+        }
+    } else {
+        showPage('teachers-page');
+    }
+}
+
+function toggleMenu() {
+    const overlay = document.getElementById('navOverlay');
+    if (overlay) {
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function closeMenu(event) {
+    if (event.target.id === 'navOverlay') {
+        document.getElementById('navOverlay').style.display = 'none';
+    }
+}
+
+function openSearchModal() {
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').focus();
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
+}
+
+window.addEventListener('click', function(event) {
+    const searchModal = document.getElementById('searchModal');
+    if (event.target === searchModal) {
+        closeSearchModal();
+    }
+});
+
+const searchIndex = [];
+
+function handleSearchInput(e) {
+    const query = e.target.value.trim().toLowerCase();
+    const container = document.getElementById('searchResultsContainer');
+    if (!query) {
+        container.innerHTML = '<div class="search-no-results">اكتب اسم المدرس للبحث...</div>';
+        return;
+    }
+    const results = searchIndex.filter(item => item.title.toLowerCase().includes(query));
+    if (results.length === 0) {
+        container.innerHTML = '<div class="search-no-results">لا توجد نتائج مطابقة لبحثك</div>';
+        return;
+    }
+    container.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="showPage('${r.page}'); closeSearchModal();">
+            <div class="search-result-content-wrap">
+                <img src="${r.image}" class="search-result-thumb" alt="${r.title}">
+                <div class="search-result-info">
+                    <span class="search-result-title">${r.title}</span>
+                    <span class="search-result-category">${r.category}</span>
+                </div>
+            </div>
+            <span>➔</span>
+        </div>
+    `).join('');
+}
+
+function sortTeacherContainer(containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    const cards = Array.from(container.querySelectorAll('.book-card-item'));
+    cards.sort((a, b) => {
+        const countA = parseInt(a.querySelector('[id^="votes-count-"]').innerText || '0');
+        const countB = parseInt(b.querySelector('[id^="votes-count-"]').innerText || '0');
+        return countB - countA;
+    });
+    cards.forEach(card => container.appendChild(card));
+}
+
+// دالة التصويت الحقيقي المتزامنة عبر Firebase
+const categories = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
+
+function voteTeacher(category, teacherId) {
+    let userVote = localStorage.getItem('user_vote_' + category);
+    let voteRef = db.ref('votes/' + category + '/' + teacherId);
+
+    voteRef.transaction(currentVotes => {
+        currentVotes = currentVotes || 0;
+        if (userVote === teacherId) {
+            // إلغاء التصويت إذا سبق التصويت له
+            localStorage.removeItem('user_vote_' + category);
+            return Math.max(0, currentVotes - 1);
+        } else {
+            if (userVote) {
+                // إذا كان المستخدم قد صوت لمدرس آخر في نفس المادة، نقوم بتقليل صوت المدرس القديم
+                let prevVoteRef = db.ref('votes/' + category + '/' + userVote);
+                prevVoteRef.transaction(prevCount => Math.max(0, (prevCount || 1) - 1));
+            }
+            localStorage.setItem('user_vote_' + category, teacherId);
+            return currentVotes + 1;
+        }
+    }, (error, committed) => {
+        if (error) {
+            console.error('فشل عملية التصويت:', error);
+        }
+    });
+}
+
+// الاستماع للتغيرات الحية (Real-time listeners) لكل المواد وتحديث واجهة المستخدم والترتيب تلقائياً
+function initRealtimeVotes() {
+    categories.forEach(cat => {
+        let categoryRef = db.ref('votes/' + cat);
+        categoryRef.on('value', snapshot => {
+            let data = snapshot.val() || {};
+            let userVote = localStorage.getItem('user_vote_' + cat);
+
+            // الحصول على كافة المدرسين في هذا القسم وتحديث أصواتهم
+            let container = document.querySelector('#teacher-' + cat + ' .books-list-container');
+            if (!container) return;
+
+            let cards = Array.from(container.querySelectorAll('.book-card-item'));
+            cards.forEach(card => {
+                let tId = card.getAttribute('data-teacher-id');
+                let votes = data[tId] || 0;
+                
+                let countEl = document.getElementById('votes-count-' + tId);
+                let btnEl = document.getElementById('vote-btn-' + tId);
+                let textEl = document.getElementById('vote-text-' + tId);
+
+                if (countEl) countEl.innerText = votes;
+                if (btnEl && textEl) {
+                    if (userVote === tId) {
+                        btnEl.style.background = '#059669';
+                        textEl.innerText = 'تم التصويت ✓ (إلغاء)';
+                    } else {
+                        btnEl.style.background = '#10b981';
+                        textEl.innerText = 'تصويت';
+                    }
+                }
+            });
+
+            // إعادة ترتيب الكاردات تلقائياً بناءً على عدد الأصوات الأعلى
+            sortTeacherContainer('#teacher-' + cat + ' .books-list-container');
+        });
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    initRealtimeVotes();
+});
+</script>
+</body>
+</html>
