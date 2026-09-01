@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>شيرادله السادس - منصة تعليميه</title>
+<title>شيرادله السادس - منصة تعليمية</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.vote-action-btn { background: #10b981; color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s, transform 0.1s; font-size: 0.9rem; }
-.vote-action-btn:hover { background: #059669; }
-.vote-action-btn:active { transform: scale(0.96); }
 .search-toggle-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; color: var(--text-color, #1e293b); transition: background 0.2s; }
 .search-toggle-btn:hover { background: rgba(0,0,0,0.05); }
 .search-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: flex-start; padding-top: 80px; animation: modalPop 0.2s ease; }
@@ -27,14 +24,16 @@
 .search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
 .search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
 .search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
+.page-view { display: none; }
+.page-view.active { display: block; }
 </style>
 </head>
 <body>
 <nav class="side-nav-bar"><div class="side-nav-links">
-<div class="side-nav-item active" onclick="switchPage('home', this)" data-page="home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>الرئيسية</span></div>
-<div class="side-nav-item" onclick="switchPage('teachers-page', this)" data-page="teachers-page"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span>المدرسين</span></div>
-<div class="side-nav-item" onclick="switchPage('chats-page', this)" data-page="chats-page"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg><span>سوالف</span></div>
-<div class="side-nav-item" onclick="switchPage('notifications-page', this); hideBadge();" data-page="notifications-page"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>الإشعارات</span></div>
+<div class="side-nav-item active" onclick="switchPage('home', this)" data-page="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>الرئيسية</span></div>
+<div class="side-nav-item" onclick="window.location.href='mdrsen.html'" data-page="teachers-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span>المدرسين</span></div>
+<div class="side-nav-item" onclick="switchPage('chats-page', this)" data-page="chats-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg><span>سوالف</span></div>
+<div class="side-nav-item" onclick="switchPage('notifications-page', this); hideBadge();" data-page="notifications-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>الإشعارات</span></div>
 </div></nav>
 <header>
 <div class="logo-container" onclick="showPage('home')">
@@ -43,7 +42,7 @@
 </div>
 <div class="header-actions">
 <button class="search-toggle-btn" onclick="openSearchModal()" title="بحث"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
-<button class="notif-toggle" onclick="switchPage('notifications-page', document.querySelector('[data-page=notifications-page]')); hideBadge();" title="الإشعارات"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span class="notif-badge" id="notifBadge"></span></button>
+<button class="notif-toggle" onclick="switchPage('notifications-page', document.querySelector('[data-page=notifications-page]')); hideBadge();" title="الإشعارات"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span class="notif-badge" id="notifBadge"></span></button>
 <button class="menu-toggle" onclick="toggleMenu()" title="القائمة"><span></span><span></span><span></span></button>
 </div>
 </header>
@@ -55,13 +54,14 @@
 </div>
 <div class="drawer-menu-list">
 <div onclick="showPage('home'); toggleMenu();" class="drawer-link"><span>🏠</span> الصفحة الرئيسية</div>
-<div onclick="showPage('teachers-page'); toggleMenu();" class="drawer-link"><span>👨‍🏫</span> قائمة المدرسين</div>
-<div onclick="showPage('books-page'); toggleMenu();" class="drawer-link"><span>📚</span> الكتب المنهجية</div>
-<div onclick="showPage('mlazem-page'); toggleMenu();" class="drawer-link"><span>📖</span> الملازم</div>
-<div onclick="showPage('ministerial-copies-page'); toggleMenu();" class="drawer-link"><span>📋</span> النسخ الوزارية</div>
+<div onclick="window.location.href='mdrsen.html'; toggleMenu();" class="drawer-link"><span>👨‍🏫</span> قائمة المدرسين</div>
+<div onclick="window.location.href='books.html'; toggleMenu();" class="drawer-link"><span>📚</span> الكتب المنهجية</div>
+<div onclick="window.location.href='malazm.html'; toggleMenu();" class="drawer-link"><span>📖</span> الملازم</div>
+<div onclick="window.location.href='results.html'; toggleMenu();" class="drawer-link"><span>🏆</span> النتائج الوزارية</div>
+<div onclick="window.location.href='newiraq.html'; toggleMenu();" class="drawer-link"><span>📋</span> النسخ الوزارية</div>
 <div onclick="showPage('chats-page'); toggleMenu();" class="drawer-link"><span>💬</span> سوالف</div>
-<div onclick="showPage('courses-page'); toggleMenu();" class="drawer-link"><span>💻</span> الدورات الإلكترونية</div>
-<div onclick="showPage('ministerial-page'); toggleMenu();" class="drawer-link"><span>📝</span> الامتحانات الوزارية</div>
+<div onclick="window.location.href='videos.html'; toggleMenu();" class="drawer-link"><span>💻</span> الدورات الإلكترونية</div>
+<div onclick="window.location.href='exams.html'; toggleMenu();" class="drawer-link"><span>📝</span> الامتحانات الوزارية</div>
 <div onclick="showPage('notifications-page'); toggleMenu();" class="drawer-link"><span>🔔</span> مركز الإشعارات</div>
 </div>
 </div>
@@ -71,234 +71,20 @@
 <div id="home" class="page-view active" data-parent="home">
 <div class="ads-slider-container" id="adsSlider">
 <div class="ads-slider-track" id="adsTrack">
-<div class="ad-slide-item" onclick="showPage('books-page', 'home')"><img src="https://i.imgur.com/IcszMVF.jpeg" alt="إعلان 1"></div>
-<div class="ad-slide-item" onclick="showPage('books-page', 'home')"><img src="https://i.imgur.com/7Tw9QFc.jpeg" alt="إعلان 2"></div>
-<div class="ad-slide-item" onclick="showPage('books-page', 'home')"><img src="https://i.imgur.com/nGVH3yL.jpeg" alt="إعلان 3"></div>
+<div class="ad-slide-item" onclick="window.location.href='books.html'"><img src="https://i.imgur.com/IcszMVF.jpeg" alt="إعلان 1"></div>
+<div class="ad-slide-item" onclick="window.location.href='books.html'"><img src="https://i.imgur.com/7Tw9QFc.jpeg" alt="إعلان 2"></div>
+<div class="ad-slide-item" onclick="window.location.href='books.html'"><img src="https://i.imgur.com/nGVH3yL.jpeg" alt="إعلان 3"></div>
 </div>
 <div class="slider-dots" id="sliderDots"><span class="slider-dot active" onclick="currentSlide(0)"></span><span class="slider-dot" onclick="currentSlide(1)"></span><span class="slider-dot" onclick="currentSlide(2)"></span></div>
 </div>
 <div class="page-header"><h2 class="page-title">مرحباً بك في منصتك الاحترافية</h2><p class="page-subtitle">اختر القسم الذي تريد تصفحه والبدء في دراستك</p></div>
 <div class="grid">
-<div class="card-btn" onclick="showPage('books-page', 'home')"><span class="card-badge">المنهج الوزاري</span><div class="card-icon-wrapper">📚</div><div><div class="card-title">الكتب المنهجية</div><div class="card-desc">تحميل الكتب المدرسية الرسمية المقررة للسادس العلمي</div></div><div class="btn-action"><span>عرض الكتب</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('mlazem-page', 'home')"><span class="card-badge">ملازم الأساتذة</span><div class="card-icon-wrapper">📖</div><div><div class="card-title">الملازم</div><div class="card-desc">تصفح وتحميل أفضل الملازم الدراسية الشاملة</div></div><div class="btn-action"><span>عرض الملازم</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('courses-page', 'home')"><span class="card-badge">تطوير دراسي</span><div class="card-icon-wrapper">💻</div><div><div class="card-title">الدورات الإلكترونية</div><div class="card-desc">أفضل الدورات والشروحات المرئية للمواد الدراسية</div></div><div class="btn-action"><span>عرض الدورات</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('ministerial-page', 'home')"><span class="card-badge">الامتحانات والوزاريات</span><div class="card-icon-wrapper">📝</div><div><div class="card-title">الامتحانات</div><div class="card-desc">الأسئلة الوزارية وجداول الامتحانات الرسمية</div></div><div class="btn-action"><span>عرض الامتحانات</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('ministerial-copies-page', 'home')"><span class="card-badge">الأرشيف الرسمي</span><div class="card-icon-wrapper">📋</div><div><div class="card-title">النسخ الوزارية</div><div class="card-desc">تصفح وتحميل النسخ الوزارية الرسمية لجميع المواد</div></div><div class="btn-action"><span>عرض النسخ</span><span>➔</span></div></div>
-</div></div>
-<div id="teachers-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">👨‍🏫 اختر افضل مدرس لعام 2027</h2><p class="page-subtitle">اختر المادة لعرض نخبة الأساتذة وتصنيفهم حسب التقييم</p></div>
-<div class="grid">
-<div class="card-btn" onclick="showPage('teacher-arabic', 'teachers-page')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">📖</div><div class="card-title">مدرسين اللغه العربيه</div><div class="card-desc">تصفح أفضل أساتذة وملازم اللغة العربية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-islamic', 'teachers-page')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">📖</div><div class="card-title">مدرسين الاسلاميه</div><div class="card-desc">تصفح أفضل أساتذة وملازم التربية الإسلامية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-english', 'teachers-page')"><span class="card-badge">مادة أساسية</span><div class="card-icon-wrapper">🔤</div><div class="card-title">مدرسين الإنكليزي</div><div class="card-desc">تصفح أفضل أساتذة وملازم اللغة الإنجليزية</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-math', 'teachers-page')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">📐</div><div class="card-title">مدرسين الرياضيات</div><div class="card-desc">تصفح أفضل أساتذة وملازم الرياضيات للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-biology', 'teachers-page')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">🧬</div><div class="card-title">مدرسين الأحياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الأحياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-chemistry', 'teachers-page')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">🧪</div><div class="card-title">مدرسين الكيمياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الكيمياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-<div class="card-btn" onclick="showPage('teacher-physics', 'teachers-page')"><span class="card-badge">مادة علمية</span><div class="card-icon-wrapper">⚡</div><div class="card-title">مدرسين الفيزياء</div><div class="card-desc">تصفح أفضل أساتذة وملازم الفيزياء للسادس العلمي</div><div class="btn-action"><span>عرض المدرسين</span><span>➔</span></div></div>
-</div></div>
-<div id="teacher-arabic" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📖 مدرسين اللغه العربيه</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ عقيل الزبيدي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-aqeel-zubaidi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-aqeel-zubaidi" onclick="voteArabicTeacher('aqeel-zubaidi')"><span id="vote-text-aqeel-zubaidi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/JM08nuw.jpeg" alt="عقيل الزبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين عبيده</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-obaida">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-obaida" onclick="voteArabicTeacher('hussein-obaida')"><span id="vote-text-hussein-obaida">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/ftflwlv.jpeg" alt="حسين عبيده" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الاستاذ حمزه الجابري</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hamza-aljabri">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hamza-aljabri" onclick="voteArabicTeacher('hamza-aljabri')"><span id="vote-text-hamza-aljabri">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/qJPcFAY.jpeg" alt="حمزه الجابري" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرسة متميزة</span><h3 class="book-main-title">الست رفل الزبيدي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-rafal-alzubaidi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-rafal-alzubaidi" onclick="voteArabicTeacher('rafal-alzubaidi')"><span id="vote-text-rafal-alzubaidi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/9R3gdou.jpeg" alt="رفل الزبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الاستاذ هشام المعموري</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة العربية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hisham-almaamouri">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hisham-almaamouri" onclick="voteArabicTeacher('hisham-almaamouri')"><span id="vote-text-hisham-almaamouri">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/Pvm8zbd.jpeg" alt="هشام المعموري" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-islamic" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📖 مدرسين الاسلاميه</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ خالد الحيالي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>التربية الإسلامية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-khaled-hayali">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-khaled-hayali" onclick="voteIslamicTeacher('khaled-hayali')"><span id="vote-text-khaled-hayali">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/I76Zdb4.jpeg" alt="خالد الحيالي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ ساجد العكيلي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>التربية الإسلامية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-sajid-akili">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-sajid-akili" onclick="voteIslamicTeacher('sajid-akili')"><span id="vote-text-sajid-akili">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/GqsUdZW.jpeg" alt="ساجد العكيلي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-math" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📐 مدرسين الرياضيات</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر عبد الائمة</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-abdulaima">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-abdulaima" onclick="voteMathTeacher('haider-abdulaima')"><span id="vote-text-haider-abdulaima">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/yxbFxrp.jpeg" alt="حيدر عبد الائمة" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر وليد</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-waleed">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-waleed" onclick="voteMathTeacher('haider-waleed')"><span id="vote-text-haider-waleed">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/xZIRMx5.jpeg" alt="حيدر وليد" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ محمد قاسم</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mohammed-qassim">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mohammed-qassim" onclick="voteMathTeacher('mohammed-qassim')"><span id="vote-text-mohammed-qassim">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/acExwFZ.jpeg" alt="محمد قاسم" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-english" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">🔤 مدرسين الإنكليزي</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ محمد العبيدي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mohammed-alobaidi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mohammed-alobaidi" onclick="voteEnglishTeacher('mohammed-alobaidi')"><span id="vote-text-mohammed-alobaidi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/zUCDQyq.jpeg" alt="محمد العبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ سجاد العبيدي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-sajjad-alobaidi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-sajjad-alobaidi" onclick="voteEnglishTeacher('sajjad-alobaidi')"><span id="vote-text-sajjad-alobaidi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/bl68sCC.jpeg" alt="سجاد العبيدي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرسة متميزة</span><h3 class="book-main-title">الست أزل سلوان</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>اللغة الإنجليزية</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-azal-salwan">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-azal-salwan" onclick="voteEnglishTeacher('azal-salwan')"><span id="vote-text-azal-salwan">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/RkxAMUv.jpeg" alt="أزل سلوان" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-biology" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">🧬 مدرسين الأحياء</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ سالم ال منصور</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-salem-almansoor">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-salem-almansoor" onclick="voteBiologyTeacher('salem-almansoor')"><span id="vote-text-salem-almansoor">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/ryqitAT.jpeg" alt="سالم ال منصور" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مصطفى حافظ</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-mustafa-hafiz">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-mustafa-hafiz" onclick="voteBiologyTeacher('mustafa-hafiz')"><span id="vote-text-mustafa-hafiz">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/23ZakX0.jpeg" alt="مصطفى حافظ" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسن فلاح</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hassan-fallah">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hassan-fallah" onclick="voteBiologyTeacher('hassan-fallah')"><span id="vote-text-hassan-fallah">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/jvv7wCd.jpeg" alt="حسن فلاح" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ جعفر الحسني</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-jaafar-alhasani">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-jaafar-alhasani" onclick="voteBiologyTeacher('jaafar-alhasani')"><span id="vote-text-jaafar-alhasani">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/uRHxEFM.jpeg" alt="جعفر الحسني" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-chemistry" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">🧪 مدرسين الكيمياء</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ فاضل الهاشمي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-fadel-alhashimi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-fadel-alhashimi" onclick="voteChemistryTeacher('fadel-alhashimi')"><span id="vote-text-fadel-alhashimi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/hFKC4G6.jpeg" alt="فاضل الهاشمي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين الهاشمي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-alhashimi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-alhashimi" onclick="voteChemistryTeacher('hussein-alhashimi')"><span id="vote-text-hussein-alhashimi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/oS6ujqX.jpeg" alt="حسين الهاشمي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حيدر عباس</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-haider-abbas">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-haider-abbas" onclick="voteChemistryTeacher('haider-abbas')"><span id="vote-text-haider-abbas">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/umkMkls.jpeg" alt="حيدر عباس" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ هاشم الغرباوي</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hashem-algharbawi">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hashem-algharbawi" onclick="voteChemistryTeacher('hashem-algharbawi')"><span id="vote-text-hashem-algharbawi">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/y47x9Gy.jpeg" alt="هاشم الغرباوي" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مهند السوداني</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-muhannad-alsudani">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-muhannad-alsudani" onclick="voteChemistryTeacher('muhannad-alsudani')"><span id="vote-text-muhannad-alsudani">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/Y8yNcaf.jpeg" alt="مهند السوداني" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-</div></div>
-<div id="teacher-physics" class="page-view" data-parent="teachers-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">⚡ مدرسين الفيزياء</h2></div>
-<div class="books-list-container">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ حسين محمد</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-hussein-mohammed">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-hussein-mohammed" onclick="votePhysicsTeacher('hussein-mohammed')"><span id="vote-text-hussein-mohammed">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/tgoLB13.jpeg" alt="حسين محمد" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">مدرس متميز</span><h3 class="book-main-title">الأستاذ مؤيد سليم</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>عدد الأصوات:</span><strong id="votes-count-muayad-salim">0</strong></div></div>
-<div class="book-actions-row"><button class="vote-action-btn" id="vote-btn-muayad-salim" onclick="votePhysicsTeacher('muayad-salim')"><span id="vote-text-muayad-salim">تصويت</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/iqsadds" target="_blank"><img src="https://i.imgur.com/6h9mMeF.jpeg" alt="مؤيد سليم" class="book-image-custom" style="border-radius: 12px; object-fit: cover;"></a></div>
-</div>
+<div class="card-btn" onclick="window.location.href='results.html'"><span class="card-badge">النتائج الوزارية</span><div class="card-icon-wrapper">🏆</div><div><div class="card-title">نتائج السادس</div><div class="card-desc">عرض وتحميل نتائج الامتحانات الوزارية لجميع المحافظات</div></div><div class="btn-action"><span>عرض النتائج</span><span>➔</span></div></div>
+<div class="card-btn" onclick="window.location.href='books.html'"><span class="card-badge">المنهج الوزاري</span><div class="card-icon-wrapper">📚</div><div><div class="card-title">الكتب المنهجية</div><div class="card-desc">تحميل الكتب المدرسية الرسمية المقررة للسادس العلمي</div></div><div class="btn-action"><span>عرض الكتب</span><span>➔</span></div></div>
+<div class="card-btn" onclick="window.location.href='malazm.html'"><span class="card-badge">ملازم الأساتذة</span><div class="card-icon-wrapper">📖</div><div><div class="card-title">الملازم</div><div class="card-desc">تصفح وتحميل أفضل الملازم الدراسية الشاملة</div></div><div class="btn-action"><span>عرض الملازم</span><span>➔</span></div></div>
+<div class="card-btn" onclick="window.location.href='videos.html'"><span class="card-badge">تطوير دراسي</span><div class="card-icon-wrapper">💻</div><div><div class="card-title">الدورات الإلكترونية</div><div class="card-desc">أفضل الدورات والشروحات المرئية للمواد الدراسية</div></div><div class="btn-action"><span>عرض الدورات</span><span>➔</span></div></div>
+<div class="card-btn" onclick="window.location.href='exams.html'"><span class="card-badge">الامتحانات والوزاريات</span><div class="card-icon-wrapper">📝</div><div><div class="card-title">الامتحانات</div><div class="card-desc">الأسئلة الوزارية وجداول الامتحانات الرسمية</div></div><div class="btn-action"><span>عرض الامتحانات</span><span>➔</span></div></div>
+<div class="card-btn" onclick="window.location.href='newiraq.html'"><span class="card-badge">الأرشيف الرسمي</span><div class="card-icon-wrapper">📋</div><div><div class="card-title">النسخ الوزارية</div><div class="card-desc">تصفح وتحميل النسخ الوزارية الرسمية لجميع المواد</div></div><div class="btn-action"><span>عرض النسخ</span><span>➔</span></div></div>
 </div></div>
 <div id="chats-page" class="page-view" data-parent="home">
 <div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
@@ -309,205 +95,15 @@
 <div class="post-content-text">أهلاً بكم أعزائنا طلبة السادس العلمي في منصتكم الرسمية. تابعوا أحدث التحديثات والملازم ونخبة المدرسين المعتمدين لضمان تفوقكم الدراسي. بالتوفيق للجميع! 🚀📚</div>
 <div class="post-image-container"><a href="https://i.imgur.com/IcszMVF.jpeg" target="_blank"><img src="https://i.imgur.com/IcszMVF.jpeg" alt="صورة المنشور"></a></div>
 </div></div></div>
-<div id="books-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📚 قسم الكتب المنهجية</h2><p class="page-subtitle">الكتب المدرسية الرسمية المقررة لطلبة السادس العلمي</p></div>
-<div class="subject-filter-bar">
-<div class="filter-chip active" onclick="filterItems('books', 'all')">الكل</div>
-<div class="filter-chip" onclick="filterItems('books', 'اللغه العربيه')">اللغه العربيه</div>
-<div class="filter-chip" onclick="filterItems('books', 'الاسلاميه')">الاسلاميه</div>
-<div class="filter-chip" onclick="filterItems('books', 'الإنكليزي')">الإنكليزي</div>
-<div class="filter-chip" onclick="filterItems('books', 'الرياضيات')">الرياضيات</div>
-<div class="filter-chip" onclick="filterItems('books', 'الأحياء')">الأحياء</div>
-<div class="filter-chip" onclick="filterItems('books', 'الكيمياء')">الكيمياء</div>
-<div class="filter-chip" onclick="filterItems('books', 'الفيزياء')">الفيزياء</div>
-</div>
-<div class="books-list-container" id="booksListContainer">
-<div class="book-card-item" data-subject="اللغه العربيه">
-<div class="book-info-side"><span class="card-badge">العلمي / الأدبي</span><h3 class="book-main-title">كتاب اللغة العربية - الجزء الأول</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المرحلة:</span><strong>السادس الإعدادي</strong></div><div class="book-meta-row"><span>الحالة:</span><strong>متوفر للتحميل المباشر</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img">تحميل الكتاب</a></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank"><img src="https://i.imgur.com/Sn0fDYJ.jpeg" alt="كتاب اللغة العربية الجزء الأول" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="اللغه العربيه">
-<div class="book-info-side"><span class="card-badge">العلمي / الأدبي</span><h3 class="book-main-title">كتاب اللغة العربية - الجزء الثاني</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المرحلة:</span><strong>السادس الإعدادي</strong></div><div class="book-meta-row"><span>الحالة:</span><strong>متوفر للتحميل المباشر</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img">تحميل الكتاب</a></div>
-</div>
-<div class="book-image-side"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank"><img src="https://i.imgur.com/UwbVzH7.jpeg" alt="كتاب اللغة العربية الجزء الثاني" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الاسلاميه">
-<div class="book-info-side">
-<div class="book-main-title">كتاب التربية الإسلامية للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الاسلاميه</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=Kqzih23Z" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/A7hMcGW.png" target="_blank"><img src="https://i.imgur.com/A7hMcGW.png" alt="كتاب الإسلامية" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الإنكليزي">
-<div class="book-info-side">
-<div class="book-main-title">كتاب اللغة الإنجليزية (الملون) للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الإنكليزي</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/fXwomks.jpeg" target="_blank"><img src="https://i.imgur.com/fXwomks.jpeg" alt="كتاب الإنكليزي الملون" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الإنكليزي">
-<div class="book-info-side">
-<div class="book-main-title">كتاب النشاط للغة الإنجليزية للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الإنكليزي</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/0gIju6E.jpeg" target="_blank"><img src="https://i.imgur.com/0gIju6E.jpeg" alt="كتاب نشاط انكليزي" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الرياضيات">
-<div class="book-info-side">
-<div class="book-main-title">كتاب الرياضيات للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=oZ8vt38X" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/I3NLMF8.jpeg" target="_blank"><img src="https://i.imgur.com/I3NLMF8.jpeg" alt="كتاب الرياضيات" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الأحياء">
-<div class="book-info-side">
-<div class="book-main-title">كتاب الأحياء للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=cmehkSWP" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/e40CY90.jpeg" target="_blank"><img src="https://i.imgur.com/e40CY90.jpeg" alt="كتاب الأحياء" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الكيمياء">
-<div class="book-info-side">
-<div class="book-main-title">كتاب الكيمياء للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=wfjnAAuZ" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/O9JznDB.jpeg" target="_blank"><img src="https://i.imgur.com/O9JznDB.jpeg" alt="كتاب الكيمياء" class="book-image-custom"></a></div>
-</div>
-<div class="book-card-item" data-subject="الفيزياء">
-<div class="book-info-side">
-<div class="book-main-title">كتاب الفيزياء للسادس العلمي PDF</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
-<div class="book-actions-row"><a href="https://t.me/zmoiibot?start=5CjUFyoD" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/eLSmykd.jpeg" target="_blank"><img src="https://i.imgur.com/eLSmykd.jpeg" alt="كتاب الفيزياء" class="book-image-custom"></a></div>
-</div>
-</div></div>
-<div id="mlazem-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📖 قسم الملازم الدراسية</h2><p class="page-subtitle">أفضل الملازم والمصادر الخارجية المعتمدة للأساتذة</p></div>
-<div class="subject-filter-bar">
-<div class="filter-chip active" onclick="filterItems('mlazem', 'all')">الكل</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'اللغه العربيه')">اللغه العربيه</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الاسلاميه')">الاسلاميه</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الإنكليزي')">الإنكليزي</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الرياضيات')">الرياضيات</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الأحياء')">الأحياء</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الكيمياء')">الكيمياء</div>
-<div class="filter-chip" onclick="filterItems('mlazem', 'الفيزياء')">الفيزياء</div>
-</div>
-<div class="books-list-container" id="mlazemListContainer"></div></div>
-<div id="ministerial-copies-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📋 قسم النسخ الوزارية</h2><p class="page-subtitle">أرشيف النسخ الوزارية الرسمية لجميع المواد الدراسية للسادس العلمي</p></div>
-<div class="subject-filter-bar">
-<div class="filter-chip active" onclick="filterItems('copies', 'all')">الكل</div>
-<div class="filter-chip" onclick="filterItems('copies', 'اللغه العربيه')">اللغه العربيه</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الاسلاميه')">الاسلاميه</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الإنكليزي')">الإنكليزي</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الرياضيات')">الرياضيات</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الأحياء')">الأحياء</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الكيمياء')">الكيمياء</div>
-<div class="filter-chip" onclick="filterItems('copies', 'الفيزياء')">الفيزياء</div>
-</div>
-<div class="books-list-container" id="copiesListContainer"></div></div>
-<div id="courses-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">💻 الدورات الإلكترونية</h2><p class="page-subtitle">أفضل الشروحات والدروس المصورة للسادس العلمي</p></div>
-<div class="subject-filter-bar">
-<div class="filter-chip active" onclick="filterItems('courses', 'all')">الكل</div>
-<div class="filter-chip" onclick="filterItems('courses', 'اللغه العربيه')">اللغه العربيه</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الاسلاميه')">الاسلاميه</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الإنكليزي')">الإنكليزي</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الرياضيات')">الرياضيات</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الأحياء')">الأحياء</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الكيمياء')">الكيمياء</div>
-<div class="filter-chip" onclick="filterItems('courses', 'الفيزياء')">الفيزياء</div>
-</div>
-<div class="books-list-container" id="coursesListContainer">
-<div class="book-card-item" data-subject="الاسلاميه">
-<div class="book-info-side">
-<div class="book-main-title">الدورة الإلكترونية - التربية الإسلامية</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>دورات إلكترونية</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الاسلاميه</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/gyffdfbot" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>مشاهدة المحاضرات</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/qZrADNS.jpeg" target="_blank"><img src="https://i.imgur.com/qZrADNS.jpeg" alt="مدرس الإسلامية" class="book-image-custom" style="border-radius:50%;"></a></div>
-</div>
-<div class="book-card-item" data-subject="اللغه العربيه">
-<div class="book-info-side">
-<div class="book-main-title">الدورة الإلكترونية - اللغة العربية</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>دورات إلكترونية</strong></div><div class="book-meta-row"><span>المادة:</span><strong>اللغه العربيه</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/rnchidbot" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>مشاهدة المحاضرات</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/Nx5NHcF.jpeg" target="_blank"><img src="https://i.imgur.com/Nx5NHcF.jpeg" alt="مدرس اللغة العربية" class="book-image-custom" style="border-radius:50%;"></a></div>
-</div>
-<div class="book-card-item" data-subject="الكيمياء">
-<div class="book-info-side">
-<div class="book-main-title">الدورة الإلكترونية - الكيمياء</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>دورات إلكترونية</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/wankibot" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>مشاهدة المحاضرات</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/o3KAlh9.jpeg" target="_blank"><img src="https://i.imgur.com/o3KAlh9.jpeg" alt="مدرس الكيمياء" class="book-image-custom" style="border-radius:50%;"></a></div>
-</div>
-<div class="book-card-item" data-subject="الفيزياء">
-<div class="book-info-side">
-<div class="book-main-title">الدورة الإلكترونية - الفيزياء</div>
-<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>دورات إلكترونية</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div></div>
-<div class="book-actions-row"><a href="https://t.me/vtchldbot" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>مشاهدة المحاضرات</span></a></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/oVrvbA7.jpeg" target="_blank"><img src="https://i.imgur.com/oVrvbA7.jpeg" alt="مدرس الفيزياء" class="book-image-custom" style="border-radius:50%;"></a></div>
-</div>
-</div></div>
-<div id="ministerial-page" class="page-view" data-parent="home">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📝 قسم الامتحانات والوزاريات</h2><p class="page-subtitle">جداول الامتحانات الوزارية الرسمية للسادس الإعدادي</p></div>
-<div class="books-list-container" id="ministerialListContainer">
-<div class="book-card-item">
-<div class="book-info-side"><span class="card-badge">الجدول الرسمي</span><h3 class="book-main-title">جدول امتحانات السادس الإعدادي (الدور الثاني)</h3>
-<div class="book-meta-list"><div class="book-meta-row"><span>المرحلة:</span><strong>السادس الإعدادي (علمي / أدبي)</strong></div><div class="book-meta-row"><span>الحالة:</span><strong>معتمد رسمياً</strong></div></div>
-<div class="book-actions-row"><button onclick="showPage('exam-detail-page', 'ministerial-page')" class="telegram-download-btn" style="background: #2563eb; color: #fff; border: none; cursor: pointer; width: 100%; justify-content: center;"><span>🔍 عرض جدول والعداد التنازلي</span></button></div>
-</div>
-<div class="book-image-side"><a href="https://i.imgur.com/26IFSw6.jpeg" target="_blank"><img src="https://i.imgur.com/26IFSw6.jpeg" alt="جدول امتحانات السادس الإعدادي الدور الثاني" class="book-image-custom"></a></div>
-</div>
-</div></div>
-<div id="exam-detail-page" class="page-view" data-parent="ministerial-page">
-<div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div>
-<div class="page-header"><h2 class="page-title">📅 جدول الامتحانات والعداد التنازلي</h2><p class="page-subtitle">السادس الإعدادي - الدور الثاني 2026</p></div>
-<div class="books-list-container"><div class="book-card-item" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px;">
-<h3 class="book-main-title" style="margin-bottom: 15px; font-size: 1.2rem; color: var(--primary-color);">الجدول الرسمي لامتحانات الدور الثاني</h3>
-<div style="width: 100%; max-width: 600px; border-radius: 8px; overflow: hidden; margin-bottom: 25px; border: 1px solid #eee; cursor: pointer; position: relative;" onclick="openExamModal()" title="اضغط لعرض الخيارات">
-<img src="https://i.imgur.com/26IFSw6.jpeg" alt="جدول الامتحانات الدور الثاني" style="width: 100%; height: auto; display: block;">
-<div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.75); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; backdrop-filter: blur(4px);">👆 اضغط على الصورة لعرض خيارات القناة والدعم</div>
-</div>
-<div style="background: #f8fafc; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 500px; border: 1px solid #e2e8f0;">
-<h4 style="margin-bottom: 15px; color: #1e293b; font-size: 1rem;">⏳ الوقت المتبقي لبدء الامتحانات (27 آب - 7:00 صباحاً)</h4>
-<div id="countdownTimer" style="display: flex; justify-content: center; gap: 12px; direction: ltr; font-weight: bold;">
-<div style="background: #fff; padding: 10px 14px; border-radius: 8px; min-width: 55px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"><span id="days" style="font-size: 1.3rem; display: block; color: #2563eb;">00</span><span style="font-size: 0.75rem; color: #64748b;">أيام</span></div>
-<div style="background: #fff; padding: 10px 14px; border-radius: 8px; min-width: 55px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"><span id="hours" style="font-size: 1.3rem; display: block; color: #2563eb;">00</span><span style="font-size: 0.75rem; color: #64748b;">ساعات</span></div>
-<div style="background: #fff; padding: 10px 14px; border-radius: 8px; min-width: 55px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"><span id="minutes" style="font-size: 1.3rem; display: block; color: #2563eb;">00</span><span style="font-size: 0.75rem; color: #64748b;">دقائق</span></div>
-<div style="background: #fff; padding: 10px 14px; border-radius: 8px; min-width: 55px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);"><span id="seconds" style="font-size: 1.3rem; display: block; color: #2563eb;">00</span><span style="font-size: 0.75rem; color: #64748b;">ثواني</span></div>
-</div></div>
-</div></div></div>
 <div id="notifications-page" class="page-view" data-parent="home"><div class="back-btn-container"><button class="back-nav-btn" onclick="goBack()"><span>➔</span> رجوع للخلف</button></div><div class="page-header"><h2 class="page-title">🔔 مركز الإشعارات والتنبيهات</h2></div><div style="background:var(--card-bg); padding:24px; border-radius:20px; text-align:center; color:var(--text-muted);">لا توجد إشعارات جديدة في الوقت الحالي.</div></div>
 </main>
 <div id="floatingContainer" class="floating-chat-container">
 <div class="floating-msg-wrapper">
 <div id="floatingMenuPopup" class="floating-menu-popup">
-<a href="https://t.me/zmoiibot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تحميل الملازم والكتب</span></a>
-<a href="https://t.me/vxcznvbot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تواصل مع الدعم الفني</span></a>
+<a href="https://t.me/zmoiibot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تحميل الملازم والكتب</span></a>
+<a href="https://t.me/vxcznvbot" target="_blank" class="floating-menu-item"><div class="tg-circle-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div><span>تواصل مع الدعم الفني</span></a>
 </div>
-<button class="floating-msg-btn" onclick="toggleFloatingMenu()" title="تواصل معنا"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg></button>
+<button class="floating-msg-btn" onclick="toggleFloatingMenu()" title="تواصل معنا"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg></button>
 </div>
 <button class="floating-btn-item floating-ai-btn" onclick="toggleAIChat()" title="مساعد الذكاء الاصطناعي">🤖</button>
 </div>
@@ -519,351 +115,163 @@
 <button class="ai-send-btn" onclick="sendAIMessage()"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
 </div>
 </div>
-<div id="examOptionsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-<div style="background: var(--card-bg, #fff); width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; animation: modalPop 0.3s ease;">
-<button onclick="closeExamModal()" style="position: absolute; top: 15px; left: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b);">&times;</button>
-<div style="text-align: center; margin-bottom: 20px;">
-<h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-color, #1e293b); margin-bottom: 5px;">خيارات منصة شيرادله السادس</h3>
-<p style="font-size: 0.85rem; color: var(--text-muted, #64748b);">اختر ما تحتاج إليه للمتابعة:</p>
-</div>
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<a href="https://t.me/xviraq" target="_blank" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-<div style="width: 40px; height: 40px; background: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div>
-<div style="font-weight: 600; font-size: 0.95rem;">قناة شيرادله السادس</div>
-</a>
-<a href="https://t.me/vxcznvbot" target="_blank" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-<div style="width: 40px; height: 40px; background: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div>
-<div style="font-weight: 600; font-size: 0.95rem;">تواصل مع الدعم الفني</div>
-</a>
-<a href="https://t.me/zmoiibot" target="_blank" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-<div style="width: 40px; height: 40px; background: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg></div>
-<div style="font-weight: 600; font-size: 0.95rem;">تحميل شيرادله السادس</div>
-</a>
-</div>
-</div>
-</div>
 <div id="searchModal" class="search-modal-overlay">
 <div class="search-modal-box" onclick="event.stopPropagation()">
 <div class="search-input-wrapper">
 <svg viewBox="0 0 24 24" width="22" height="22" fill="#64748b"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-<input type="text" id="searchInput" class="search-modal-input" placeholder="ابحث عن كتاب، ملزمة، دورة، نسخة وزارية، أو امتحان..." oninput="handleSearchInput(event)">
+<input type="text" id="searchInput" class="search-modal-input" placeholder="ابحث عن كتاب، ملزمة، دورة، أو نسخة وزارية..." oninput="handleSearchInput(event)">
 <button class="search-close-btn" onclick="closeSearchModal()">&times;</button>
 </div>
 <div id="searchResultsContainer" class="search-results-container">
-<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو الامتحان للبحث عنها داخل المنصة...</div>
+<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو النسخة الوزارية للبحث عنها...</div>
 </div>
 </div>
 </div>
-<script type="module">
-function updateCountdown() {
-    const targetDate = new Date('2026-08-27T07:00:00+03:00').getTime();
-    const now = new Date().getTime();
-    const gap = targetDate - now;
-    if (gap <= 0) {
-        document.getElementById('countdownTimer').innerHTML = '<div style="color: #16a34a; font-weight: bold; width: 100%; font-size: 1.1rem;">🚀 انطلقت الامتحانات الوزارية! بالتوفيق لجميع الطلبة</div>';
+<script>
+let pageHistory = ['home'];
+
+function showPage(pageId) {
+    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) {
+        target.classList.add('active');
+        if (pageHistory[pageHistory.length - 1] !== pageId) {
+            pageHistory.push(pageId);
+        }
+        window.scrollTo(0, 0);
+    }
+}
+
+function switchPage(pageId, element) {
+    showPage(pageId);
+    document.querySelectorAll('.side-nav-item').forEach(item => item.classList.remove('active'));
+    if (element) {
+        element.classList.add('active');
+    }
+}
+
+function goBack() {
+    if (pageHistory.length > 1) {
+        pageHistory.pop();
+        const prevPage = pageHistory[pageHistory.length - 1];
+        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(prevPage);
+        if (target) {
+            target.classList.add('active');
+        }
+    } else {
+        showPage('home');
+    }
+}
+
+function toggleMenu() {
+    const overlay = document.getElementById('navOverlay');
+    if (overlay) {
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function closeMenu(event) {
+    if (event.target.id === 'navOverlay') {
+        document.getElementById('navOverlay').style.display = 'none';
+    }
+}
+
+function hideBadge() {
+    const badge = document.getElementById('notifBadge');
+    if (badge) badge.style.display = 'none';
+}
+
+function openSearchModal() {
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').focus();
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
+}
+
+window.addEventListener('click', function(event) {
+    const searchModal = document.getElementById('searchModal');
+    if (event.target === searchModal) {
+        closeSearchModal();
+    }
+});
+
+// قاعدة بيانات شاملة للبحث تشمل الكتب المنهجية، الملازم، الدورات الإلكترونية، والنسخ الوزارية
+const searchIndex = [
+    // الكتب المنهجية
+    { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
+    { title: "كتاب الفيزياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "books.html" },
+    { title: "كتاب الكيمياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "books.html" },
+    { title: "كتاب الأحياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "books.html" },
+    
+    // الملازم
+    { title: "ملزمة الرياضيات الاستاذ حيدر وليد", category: "الملازم", image: "https://i.imgur.com/IcszMVF.jpeg", page: "malazm.html" },
+    { title: "ملزمة الفيزياء السادس العلمي الأستاذ حسن عبد الكاظم", category: "الملازم", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "malazm.html" },
+    { title: "ملزمة الكيمياء الشاملة السادس العلمي", category: "الملازم", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "malazm.html" },
+    
+    // الدورات الإلكترونية
+    { title: "دورة الرياضيات المركزة للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "videos.html" },
+    { title: "دورة الفيزياء الشاملة - المنهج كامل", category: "الدورات الإلكترونية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "videos.html" },
+    { title: "دورة الأحياء الأساسية للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "videos.html" },
+    
+    // النسخ الوزارية
+    { title: "النسخة الوزارية رياضيات دور أول 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "newiraq.html" },
+    { title: "النسخة الوزارية فيزياء دور ثاني 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "newiraq.html" },
+    { title: "النسخة الوزارية كيمياء تمهيدي 2026", category: "النسخ الوزارية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "newiraq.html" }
+];
+
+function handleSearchInput(e) {
+    const query = e.target.value.trim().toLowerCase();
+    const container = document.getElementById('searchResultsContainer');
+    
+    if (!query) {
+        container.innerHTML = '<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو النسخة الوزارية للبحث عنها...</div>';
         return;
     }
-    const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24;
-    const d = Math.floor(gap / day), h = Math.floor((gap % day) / hour), m = Math.floor((gap % hour) / minute), s = Math.floor((gap % minute) / second);
-    const daysEl = document.getElementById('days'), hoursEl = document.getElementById('hours'), minutesEl = document.getElementById('minutes'), secondsEl = document.getElementById('seconds');
-    if (daysEl) daysEl.innerText = d < 10 ? '0' + d : d;
-    if (hoursEl) hoursEl.innerText = h < 10 ? '0' + h : h;
-    if (minutesEl) minutesEl.innerText = m < 10 ? '0' + m : m;
-    if (secondsEl) secondsEl.innerText = s < 10 ? '0' + s : s;
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
 
-function sortTeacherContainer(containerSelector) {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-    const cards = Array.from(container.querySelectorAll('.book-card-item'));
-    cards.sort((a, b) => {
-        const countA = parseInt(a.querySelector('[id^="votes-count-"]').innerText || '0');
-        const countB = parseInt(b.querySelector('[id^="votes-count-"]').innerText || '0');
-        return countB - countA;
-    });
-    cards.forEach(card => container.appendChild(card));
-}
+    const queryWords = query.split(/\s+/);
 
-const arabicTeachers = ['aqeel-zubaidi', 'hussein-obaida', 'hamza-aljabri', 'rafal-alzubaidi', 'hisham-almaamouri'];
-function voteArabicTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_arabic');
-    let votesKey = 'votes_arabic_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_arabic');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_arabic_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
+    // نظام البحث الذكي (حساب درجة مطابقة الكلمات للعثور على الأشياء القريبة والمشابهة)
+    const scoredResults = searchIndex.map(item => {
+        let score = 0;
+        const fullText = (item.title + " " + item.category).toLowerCase();
+        
+        if (fullText.includes(query)) {
+            score += 15;
         }
-        localStorage.setItem('user_vote_arabic', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updateArabicVoteUI();
-}
-function updateArabicVoteUI() {
-    let userVote = localStorage.getItem('user_vote_arabic');
-    arabicTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_arabic_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
+        
+        queryWords.forEach(word => {
+            if (word.length > 1 && fullText.includes(word)) {
+                score += 5;
             }
-        }
-    });
-    sortTeacherContainer('#teacher-arabic .books-list-container');
-}
+        });
+        
+        return { item, score };
+    }).filter(res => res.score > 0);
 
-const islamicTeachers = ['khaled-hayali', 'sajid-akili'];
-function voteIslamicTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_islamic');
-    let votesKey = 'votes_islamic_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_islamic');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_islamic_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_islamic', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updateIslamicVoteUI();
-}
-function updateIslamicVoteUI() {
-    let userVote = localStorage.getItem('user_vote_islamic');
-    islamicTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_islamic_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-islamic .books-list-container');
-}
+    scoredResults.sort((a, b) => b.score - a.score);
+    const results = scoredResults.map(res => res.item);
 
-const mathTeachers = ['haider-abdulaima', 'haider-waleed', 'mohammed-qassim'];
-function voteMathTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_math');
-    let votesKey = 'votes_math_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_math');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_math_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_math', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
+    if (results.length === 0) {
+        container.innerHTML = '<div class="search-no-results">لا توجد نتائج مطابقة أو قريبة لبحثك</div>';
+        return;
     }
-    updateMathVoteUI();
-}
-function updateMathVoteUI() {
-    let userVote = localStorage.getItem('user_vote_math');
-    mathTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_math_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-math .books-list-container');
-}
 
-const englishTeachers = ['mohammed-alobaidi', 'sajjad-alobaidi', 'azal-salwan'];
-function voteEnglishTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_english');
-    let votesKey = 'votes_english_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_english');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_english_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_english', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updateEnglishVoteUI();
-}
-function updateEnglishVoteUI() {
-    let userVote = localStorage.getItem('user_vote_english');
-    englishTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_english_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-english .books-list-container');
-}
-
-const chemistryTeachers = ['fadel-alhashimi', 'hussein-alhashimi', 'haider-abbas', 'hashem-algharbawi', 'muhannad-alsudani'];
-function voteChemistryTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_chemistry');
-    let votesKey = 'votes_chemistry_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_chemistry');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_chemistry_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_chemistry', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updateChemistryVoteUI();
-}
-function updateChemistryVoteUI() {
-    let userVote = localStorage.getItem('user_vote_chemistry');
-    chemistryTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_chemistry_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-chemistry .books-list-container');
-}
-
-const physicsTeachers = ['hussein-mohammed', 'muayad-salim'];
-function votePhysicsTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_physics');
-    let votesKey = 'votes_physics_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_physics');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_physics_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_physics', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updatePhysicsVoteUI();
-}
-function updatePhysicsVoteUI() {
-    let userVote = localStorage.getItem('user_vote_physics');
-    physicsTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_physics_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-physics .books-list-container');
-}
-
-const biologyTeachers = ['salem-almansoor', 'mustafa-hafiz', 'hassan-fallah', 'jaafar-alhasani'];
-function voteBiologyTeacher(teacherId) {
-    let userVote = localStorage.getItem('user_vote_biology');
-    let votesKey = 'votes_biology_' + teacherId;
-    let currentVotes = parseInt(localStorage.getItem(votesKey) || '0');
-    if (userVote === teacherId) {
-        localStorage.removeItem('user_vote_biology');
-        localStorage.setItem(votesKey, Math.max(0, currentVotes - 1));
-    } else {
-        if (userVote) {
-            let prevVotesKey = 'votes_biology_' + userVote;
-            let prevVotes = parseInt(localStorage.getItem(prevVotesKey) || '0');
-            localStorage.setItem(prevVotesKey, Math.max(0, prevVotes - 1));
-        }
-        localStorage.setItem('user_vote_biology', teacherId);
-        localStorage.setItem(votesKey, currentVotes + 1);
-    }
-    updateBiologyVoteUI();
-}
-function updateBiologyVoteUI() {
-    let userVote = localStorage.getItem('user_vote_biology');
-    biologyTeachers.forEach(id => {
-        let votes = localStorage.getItem('votes_biology_' + id) || '0';
-        let countEl = document.getElementById('votes-count-' + id);
-        let btnEl = document.getElementById('vote-btn-' + id);
-        let textEl = document.getElementById('vote-text-' + id);
-        if (countEl) countEl.innerText = votes;
-        if (btnEl && textEl) {
-            if (userVote === id) {
-                btnEl.style.background = '#059669';
-                textEl.innerText = 'تم التصويت ✓ (إلغاء)';
-            } else {
-                btnEl.style.background = '#10b981';
-                textEl.innerText = 'تصويت';
-            }
-        }
-    });
-    sortTeacherContainer('#teacher-biology .books-list-container');
+    // عرض النتائج مع التحقق من وجود الصورة (إذا وجدت يتم عرضها، وإلا يتم عرض أيقونة افتراضية)
+    container.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="window.location.href='${r.page}'; closeSearchModal();">
+            <div class="search-result-content-wrap">
+                ${r.image ? `<img src="${r.image}" class="search-result-thumb" alt="${r.title}">` : `<div class="search-result-thumb" style="display:flex;align-items:center;justify-content:center;background:#e2e8f0;font-size:1.1rem;">📁</div>`}
+                <div class="search-result-info">
+                    <span class="search-result-title">${r.title}</span>
+                    <span class="search-result-category">${r.category}</span>
+                </div>
+            </div>
+            <span>➔</span>
+        </div>
+    `).join('');
 }
 </script>
 </body>
