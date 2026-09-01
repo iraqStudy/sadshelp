@@ -129,6 +129,7 @@
 </div>
 <script>
 let pageHistory = ['home'];
+let slideIndex = 0;
 
 function showPage(pageId) {
     document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
@@ -198,25 +199,70 @@ window.addEventListener('click', function(event) {
     }
 });
 
+// دوال إضافية لتشغيل أزرار التفاعل (القائمة العائمة ومساعد الذكاء الاصطناعي والمزلق)
+function toggleFloatingMenu() {
+    const popup = document.getElementById('floatingMenuPopup');
+    if (popup) {
+        popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function toggleAIChat() {
+    const chatWin = document.getElementById('aiChatWindow');
+    if (chatWin) {
+        chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function sendAIMessage() {
+    const input = document.getElementById('aiChatInput');
+    const body = document.getElementById('aiChatBody');
+    if (!input || !input.value.trim()) return;
+    const text = input.value.trim();
+    
+    body.innerHTML += `<div class="ai-message user">${text}</div>`;
+    input.value = '';
+    body.scrollTop = body.scrollHeight;
+
+    setTimeout(() => {
+        body.innerHTML += `<div class="ai-message bot">أهلاً بك يا مصطفى! أنا جاهز لمساعدتك في أي استفسار دراسي ضمن المنهج.</div>`;
+        body.scrollTop = body.scrollHeight;
+    }, 1000);
+}
+
+function handleAIPress(e) {
+    if (e.key === 'Enter') {
+        sendAIMessage();
+    }
+}
+
+function currentSlide(n) {
+    showSlide(slideIndex = n);
+}
+
+function showSlide(n) {
+    const track = document.getElementById('adsTrack');
+    const dots = document.querySelectorAll('.slider-dot');
+    if (!track) return;
+    if (n >= track.children.length) slideIndex = 0;
+    if (n < 0) slideIndex = track.children.length - 1;
+    track.style.transform = `translateX(-${slideIndex * 100}%)`;
+    dots.forEach(d => d.classList.remove('active'));
+    if (dots[slideIndex]) dots[slideIndex].classList.add('active');
+}
+
 // قاعدة بيانات شاملة للبحث تشمل الكتب المنهجية، الملازم، الدورات الإلكترونية، والنسخ الوزارية
 const searchIndex = [
-    // الكتب المنهجية
     { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
     { title: "كتاب الفيزياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "books.html" },
     { title: "كتاب الكيمياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "books.html" },
     { title: "كتاب الأحياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "books.html" },
-    
-    // الملازم
     { title: "ملزمة الرياضيات الاستاذ حيدر وليد", category: "الملازم", image: "https://i.imgur.com/IcszMVF.jpeg", page: "malazm.html" },
     { title: "ملزمة الفيزياء السادس العلمي الأستاذ حسن عبد الكاظم", category: "الملازم", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "malazm.html" },
     { title: "ملزمة الكيمياء الشاملة السادس العلمي", category: "الملازم", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "malazm.html" },
-    
-    // الدورات الإلكترونية
     { title: "دورة الرياضيات المركزة للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "videos.html" },
     { title: "دورة الفيزياء الشاملة - المنهج كامل", category: "الدورات الإلكترونية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "videos.html" },
     { title: "دورة الأحياء الأساسية للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "videos.html" },
-    
-    // النسخ الوزارية
     { title: "النسخة الوزارية رياضيات دور أول 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "newiraq.html" },
     { title: "النسخة الوزارية فيزياء دور ثاني 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "newiraq.html" },
     { title: "النسخة الوزارية كيمياء تمهيدي 2026", category: "النسخ الوزارية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "newiraq.html" }
@@ -233,7 +279,6 @@ function handleSearchInput(e) {
 
     const queryWords = query.split(/\s+/);
 
-    // نظام البحث الذكي (حساب درجة مطابقة الكلمات للعثور على الأشياء القريبة والمشابهة)
     const scoredResults = searchIndex.map(item => {
         let score = 0;
         const fullText = (item.title + " " + item.category).toLowerCase();
@@ -259,7 +304,6 @@ function handleSearchInput(e) {
         return;
     }
 
-    // عرض النتائج مع التحقق من وجود الصورة (إذا وجدت يتم عرضها، وإلا يتم عرض أيقونة افتراضية)
     container.innerHTML = results.map(r => `
         <div class="search-result-item" onclick="window.location.href='${r.page}'; closeSearchModal();">
             <div class="search-result-content-wrap">
