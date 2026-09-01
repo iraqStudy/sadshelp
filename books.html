@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الكتب المنهجية - شيرادله السادس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.view-book-btn {
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-size: 0.95rem;
+    width: 100%;
+}
+.view-book-btn:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+.book-actions-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+.book-detail-view {
+    display: none;
+}
+.book-detail-view.active {
+    display: block;
+}
+.books-main-view {
+    display: block;
+}
+.books-main-view.hidden {
+    display: none;
+}
+.book-detail-container {
+    background: var(--card-bg, #fff);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+}
+.book-detail-cover {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border: 1px solid #e2e8f0;
+    object-fit: contain;
+}
+
+/* قسم عداد المشاهدات والتحميلات */
+.book-stats-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+}
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 700;
+}
+
+.action-btn-telegram {
+    background: #229ed9;
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 35px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(34, 158, 217, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+.action-btn-telegram:hover { background: #1b85b8; transform: translateY(-2px); }
+
+.action-btn-buy {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 35px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+.action-btn-buy:hover { background: #059669; transform: translateY(-2px); }
+
+.action-btn-similar {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 35px;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+.action-btn-similar:hover { background: #dc2626; transform: translateY(-2px); }
+
+/* قسم الملفات المشابهة المنسدل */
+.similar-files-section {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    display: none;
+    margin-top: 5px;
+}
+.similar-files-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+.similar-card-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.similar-card-item:hover { background: #f1f5f9; }
+.similar-card-img { width: 45px; height: 60px; object-fit: cover; border-radius: 6px; }
+.similar-card-info h4 { font-size: 0.9rem; color: #1e293b; margin: 0 0 4px 0; }
+.similar-card-info p { font-size: 0.75rem; color: #64748b; margin: 0; }
+
+/* نظام النجوم التفاعلي */
+.rating-container {
+    text-align: center;
+    width: 100%;
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+}
+.rating-stars {
+    display: flex;
+    gap: 8px;
+    font-size: 2rem;
+    color: #cbd5e1;
+    justify-content: center;
+    cursor: pointer;
+    direction: ltr;
+    margin-bottom: 6px;
+}
+.rating-stars .star {
+    transition: color 0.2s, transform 0.2s;
+}
+.rating-stars .star:hover,
+.rating-stars .star.active {
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+.rating-info-text {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 700;
+}
+
+.social-share-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 5px;
+}
+.social-share-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.3rem;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.social-share-icon:hover { transform: scale(1.08); }
+.whatsapp-bg { background: #25d366; }
+.telegram-bg { background: #229ed9; }
+.facebook-bg { background: #1877f2; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<header>
+<div class="logo-container" onclick="window.location.href='index.html'">
+<div class="logo-icon"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;"></div>
+<div class="logo-text"><h1>شيرادله</h1><h2>السادس</h2></div>
+</div>
+</header>
+<main>
+<div style="padding: 20px;">
+
+<!-- عرض قائمة الكتب الرئيسية -->
+<div id="booksMainView" class="books-main-view">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="window.location.href='index.html'"><span>➔</span> العودة للرئيسية</button></div>
+<div class="page-header"><h2 class="page-title">📚 قسم الكتب المنهجية</h2><p class="page-subtitle">الكتب المدرسية الرسمية المقررة لطلبة السادس العلمي</p></div>
+<div class="subject-filter-bar">
+<div class="filter-chip active" onclick="filterItems('all', this)">الكل</div>
+<div class="filter-chip" onclick="filterItems('اللغه العربيه', this)">اللغه العربيه</div>
+<div class="filter-chip" onclick="filterItems('الاسلاميه', this)">الاسلاميه</div>
+<div class="filter-chip" onclick="filterItems('الإنكليزي', this)">الإنكليزي</div>
+<div class="filter-chip" onclick="filterItems('الرياضيات', this)">الرياضيات</div>
+<div class="filter-chip" onclick="filterItems('الأحياء', this)">الأحياء</div>
+<div class="filter-chip" onclick="filterItems('الكيمياء', this)">الكيمياء</div>
+<div class="filter-chip" onclick="filterItems('الفيزياء', this)">الفيزياء</div>
+</div>
+<div class="books-list-container" id="booksListContainer">
+
+<div class="book-card-item" data-subject="اللغه العربيه">
+<div class="book-info-side"><span class="card-badge">العلمي / الأدبي</span><h3 class="book-main-title">كتاب اللغة العربية - الجزء الأول</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المرحلة:</span><strong>السادس الإعدادي</strong></div><div class="book-meta-row"><span>الحالة:</span><strong>متوفر للتحميل المباشر</strong></div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img">تحميل الكتاب</a>
+<button class="view-book-btn" onclick="openBookDetail('arabic1')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank"><img src="https://i.imgur.com/Sn0fDYJ.jpeg" alt="كتاب اللغة العربية الجزء الأول" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="اللغه العربيه">
+<div class="book-info-side"><span class="card-badge">العلمي / الأدبي</span><h3 class="book-main-title">كتاب اللغة العربية - الجزء الثاني</h3>
+<div class="book-meta-list"><div class="book-meta-row"><span>المرحلة:</span><strong>السادس الإعدادي</strong></div><div class="book-meta-row"><span>الحالة:</span><strong>متوفر للتحميل المباشر</strong></div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img">تحميل الكتاب</a>
+<button class="view-book-btn" onclick="openBookDetail('arabic2')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=Lv9ocQkA" target="_blank"><img src="https://i.imgur.com/UwbVzH7.jpeg" alt="كتاب اللغة العربية الجزء الثاني" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الاسلاميه">
+<div class="book-info-side">
+<div class="book-main-title">كتاب التربية الإسلامية للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الاسلاميه</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=Kqzih23Z" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('islamic')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=Kqzih23Z" target="_blank"><img src="https://i.imgur.com/A7hMcGW.png" alt="كتاب الإسلامية" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الإنكليزي">
+<div class="book-info-side">
+<div class="book-main-title">كتاب اللغة الإنجليزية (الملون) للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الإنكليزي</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('english1')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank"><img src="https://i.imgur.com/fXwomks.jpeg" alt="كتاب الإنكليزي الملون" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الإنكليزي">
+<div class="book-info-side">
+<div class="book-main-title">كتاب النشاط للغة الإنجليزية للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الإنكليزي</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('english2')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=JJEeupBk" target="_blank"><img src="https://i.imgur.com/0gIju6E.jpeg" alt="كتاب نشاط انكليزي" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الرياضيات">
+<div class="book-info-side">
+<div class="book-main-title">كتاب الرياضيات للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الرياضيات</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=oZ8vt38X" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('math')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=oZ8vt38X" target="_blank"><img src="https://i.imgur.com/I3NLMF8.jpeg" alt="كتاب الرياضيات" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الأحياء">
+<div class="book-info-side">
+<div class="book-main-title">كتاب الأحياء للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الأحياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=cmehkSWP" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('biology')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=cmehkSWP" target="_blank"><img src="https://i.imgur.com/e40CY90.jpeg" alt="كتاب الأحياء" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الكيمياء">
+<div class="book-info-side">
+<div class="book-main-title">كتاب الكيمياء للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الكيمياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=wfjnAAuZ" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('chemistry')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=wfjnAAuZ" target="_blank"><img src="https://i.imgur.com/O9JznDB.jpeg" alt="كتاب الكيمياء" class="book-image-custom"></a></div>
+</div>
+
+<div class="book-card-item" data-subject="الفيزياء">
+<div class="book-info-side">
+<div class="book-main-title">كتاب الفيزياء للسادس العلمي PDF</div>
+<div class="book-meta-list"><div class="book-meta-row"><span>التصنيف:</span><strong>كتاب منهجي رسمي</strong></div><div class="book-meta-row"><span>المادة:</span><strong>الفيزياء</strong></div><div class="book-meta-row"><span>ℹ️ الصف:</span> السادس العلمي</div></div>
+<div class="book-actions-row">
+<a href="https://t.me/zmoiibot?start=5CjUFyoD" target="_blank" class="telegram-download-btn"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="tg-icon-img" style="border-radius:50%;"><span>تحميل الكتاب</span></a>
+<button class="view-book-btn" onclick="openBookDetail('physics')">📖 عرض الكتاب</button>
+</div>
+</div>
+<div class="book-image-side"><a href="https://t.me/zmoiibot?start=5CjUFyoD" target="_blank"><img src="https://i.imgur.com/eLSmykd.jpeg" alt="كتاب الفيزياء" class="book-image-custom"></a></div>
+</div>
+
+</div>
+</div>
+
+<!-- واجهة تفاصيل الكتاب -->
+<div id="bookDetailView" class="book-detail-view">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="closeBookDetail()"><span>➔</span> العودة للقائمة</button></div>
+<div class="page-header"><h2 class="page-title" id="detailTitle">عرض الكتاب</h2></div>
+
+<div class="book-detail-container">
+<img id="detailImage" src="" alt="صورة الكتاب" class="book-detail-cover">
+
+<!-- عداد المشاهدات والتحميلات الحقيقي -->
+<div class="book-stats-container">
+<div class="stat-box">👁️ المشاهدات: <span id="viewsCount" style="color: #6366f1;">0</span></div>
+<div class="stat-box">📥 التحميلات: <span id="downloadsCount" style="color: #10b981;">0</span></div>
+</div>
+
+<!-- زر تحميل بواسطة التلكرام -->
+<a id="detailTelegramBtn" href="#" target="_blank" class="action-btn-telegram" onclick="recordDownload()">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg>
+تحميل بواسطة التلكرام
+</a>
+
+<!-- زر شراء النسخة الأصلية -->
+<a href="https://t.me/C_3_F" target="_blank" class="action-btn-buy" onclick="recordDownload()">
+🛒 شراء النسخة الأصلية
+</a>
+
+<!-- زر ملفات أخرى مشابهة -->
+<button onclick="toggleSimilarFiles()" class="action-btn-similar">
+📖 ملفات أخرى مشابهة
+</button>
+
+<!-- قسم الملفات المشابهة المنبثق -->
+<div id="similarFilesSection" class="similar-files-section">
+<h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #1e293b; text-align: right;">ملازم وكتب مشابهة للمادة:</h4>
+<div id="similarFilesList"></div>
+</div>
+
+<!-- نظام التقييم الحقيقي والتفاعلي -->
+<div class="rating-container">
+<div class="rating-stars" id="interactiveStars">
+<span class="star" data-value="5">★</span>
+<span class="star" data-value="4">★</span>
+<span class="star" data-value="3">★</span>
+<span class="star" data-value="2">★</span>
+<span class="star" data-value="1">★</span>
+</div>
+<div class="rating-info-text" id="ratingInfoText">تقييم الطلبة للملف: 4.8 (142 تقييم)</div>
+</div>
+
+<!-- أزرار مشاركة المنشور الحقيقية -->
+<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 5px;">
+<div class="social-share-row">
+<a id="shareWhatsapp" href="#" target="_blank" class="social-share-icon whatsapp-bg" title="مشاركة عبر واتساب">
+<svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+</a>
+<a id="shareTelegram" href="#" target="_blank" class="social-share-icon telegram-bg" title="مشاركة عبر تلكرام">
+<svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.08-.78 4.22-1.84 7.03-3.05 8.43-3.62 4.01-1.66 4.84-1.95 5.38-1.96.12 0 .39.03.56.17.15.12.19.28.21.4-.02.07-.02.24-.04.38z"/></svg>
+</a>
+<a id="shareFacebook" href="#" target="_blank" class="social-share-icon facebook-bg" title="مشاركة عبر فيسبوك">
+<svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.37 14.5 5 15.5 5H18V0h-3.808C10.59 0 9 1.582 9 4.615V8z"/></svg>
+</a>
+</div>
+<div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">شارك المنشور</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</main>
+<script>
+const booksData = {
+    'arabic1': { title: 'كتاب اللغة العربية - الجزء الأول', image: 'https://i.imgur.com/Sn0fDYJ.jpeg', telegram: 'https://t.me/zmoiibot?start=Lv9ocQkA', subject: 'اللغه العربيه' },
+    'arabic2': { title: 'كتاب اللغة العربية - الجزء الثاني', image: 'https://i.imgur.com/UwbVzH7.jpeg', telegram: 'https://t.me/zmoiibot?start=Lv9ocQkA', subject: 'اللغه العربيه' },
+    'islamic': { title: 'كتاب التربية الإسلامية للسادس العلمي PDF', image: 'https://i.imgur.com/A7hMcGW.png', telegram: 'https://t.me/zmoiibot?start=Kqzih23Z', subject: 'الاسلاميه' },
+    'english1': { title: 'كتاب اللغة الإنجليزية (الملون) للسادس العلمي PDF', image: 'https://i.imgur.com/fXwomks.jpeg', telegram: 'https://t.me/zmoiibot?start=JJEeupBk', subject: 'الإنكليزي' },
+    'english2': { title: 'كتاب النشاط للغة الإنجليزية للسادس العلمي PDF', image: 'https://i.imgur.com/0gIju6E.jpeg', telegram: 'https://t.me/zmoiibot?start=JJEeupBk', subject: 'الإنكليزي' },
+    'math': { title: 'كتاب الرياضيات للسادس العلمي PDF', image: 'https://i.imgur.com/I3NLMF8.jpeg', telegram: 'https://t.me/zmoiibot?start=oZ8vt38X', subject: 'الرياضيات' },
+    'biology': { title: 'كتاب الأحياء للسادس العلمي PDF', image: 'https://i.imgur.com/e40CY90.jpeg', telegram: 'https://t.me/zmoiibot?start=cmehkSWP', subject: 'الأحياء' },
+    'chemistry': { title: 'كتاب الكيمياء للسادس العلمي PDF', image: 'https://i.imgur.com/O9JznDB.jpeg', telegram: 'https://t.me/zmoiibot?start=wfjnAAuZ', subject: 'الكيمياء' },
+    'physics': { title: 'كتاب الفيزياء للسادس العلمي PDF', image: 'https://i.imgur.com/eLSmykd.jpeg', telegram: 'https://t.me/zmoiibot?start=5CjUFyoD', subject: 'الفيزياء' }
+};
+
+let currentBookId = null;
+
+// قاعدة بيانات افتراضية للتقييمات
+const defaultRatings = {
+    'arabic1': { totalScore: 680, count: 142 },
+    'arabic2': { totalScore: 610, count: 130 },
+    'islamic': { totalScore: 480, count: 100 },
+    'english1': { totalScore: 740, count: 155 },
+    'english2': { totalScore: 520, count: 110 },
+    'math': { totalScore: 890, count: 180 },
+    'biology': { totalScore: 690, count: 145 },
+    'chemistry': { totalScore: 760, count: 160 },
+    'physics': { totalScore: 840, count: 175 }
+};
+
+// قاعدة بيانات افتراضية للمشاهدات والتحميلات
+const defaultStats = {
+    'arabic1': { views: 420, downloads: 185 },
+    'arabic2': { views: 390, downloads: 160 },
+    'islamic': { views: 310, downloads: 140 },
+    'english1': { views: 510, downloads: 220 },
+    'english2': { views: 280, downloads: 115 },
+    'math': { views: 650, downloads: 290 },
+    'biology': { views: 450, downloads: 195 },
+    'chemistry': { views: 490, downloads: 210 },
+    'physics': { views: 580, downloads: 255 }
+};
+
+function filterItems(subject, element) {
+    document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+    if(element) element.classList.add('active');
+    const container = document.getElementById('booksListContainer');
+    if (!container) return;
+    const items = container.querySelectorAll('.book-card-item');
+    items.forEach(item => {
+        const itemSubject = item.getAttribute('data-subject');
+        if (subject === 'all' || itemSubject === subject) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function openBookDetail(bookId) {
+    const book = booksData[bookId];
+    if (!book) return;
+    currentBookId = bookId;
+
+    document.getElementById('detailTitle').innerText = book.title;
+    document.getElementById('detailImage').src = book.image;
+    document.getElementById('detailTelegramBtn').href = book.telegram;
+
+    document.getElementById('similarFilesSection').classList.remove('active');
+
+    // تتبع المشاهدات (تزيد مرة واحدة لكل جلسة متصفح لكل كتاب)
+    incrementViews(bookId);
+    updateStatsDisplay(bookId);
+
+    // تجهيز روابط المشاركة الذكية مع البارامتر
+    const shareUrl = window.location.origin + window.location.pathname + '?book=' + bookId;
+    const shareText = encodeURIComponent(`شاهد أو احصل على "${book.title}" عبر منصة شيرادله السادس:`);
+    
+    document.getElementById('shareWhatsapp').href = `https://api.whatsapp.com/send?text=${shareText}%20${encodeURIComponent(shareUrl)}`;
+    document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}`;
+    document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+
+    populateSimilarFiles(book.subject, bookId);
+    updateRatingDisplay(bookId);
+
+    document.getElementById('booksMainView').classList.add('hidden');
+    document.getElementById('bookDetailView').classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function closeBookDetail() {
+    currentBookId = null;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    document.getElementById('bookDetailView').classList.remove('active');
+    document.getElementById('booksMainView').classList.remove('hidden');
+    window.scrollTo(0, 0);
+}
+
+function toggleSimilarFiles() {
+    const section = document.getElementById('similarFilesSection');
+    section.classList.toggle('active');
+}
+
+// دوال إدارة العدادات (المشاهدات والتحميلات)
+function getBookStats(bookId) {
+    const saved = localStorage.getItem('stats_' + bookId);
+    if (saved) return JSON.parse(saved);
+    return defaultStats[bookId] || { views: 200, downloads: 90 };
+}
+
+function updateStatsDisplay(bookId) {
+    const stats = getBookStats(bookId);
+    document.getElementById('viewsCount').innerText = stats.views;
+    document.getElementById('downloadsCount').innerText = stats.downloads;
+}
+
+function incrementViews(bookId) {
+    const sessionKey = 'viewed_session_' + bookId;
+    if (!sessionStorage.getItem(sessionKey)) {
+        let stats = getBookStats(bookId);
+        stats.views += 1;
+        localStorage.setItem('stats_' + bookId, JSON.stringify(stats));
+        sessionStorage.setItem(sessionKey, 'true');
+    }
+}
+
+function recordDownload() {
+    if (!currentBookId) return;
+    let stats = getBookStats(currentBookId);
+    stats.downloads += 1;
+    localStorage.setItem('stats_' + currentBookId, JSON.stringify(stats));
+    updateStatsDisplay(currentBookId);
+}
+
+function populateSimilarFiles(subject, excludeId) {
+    const listContainer = document.getElementById('similarFilesList');
+    listContainer.innerHTML = '';
+    
+    let found = false;
+    for (const [id, data] of Object.entries(booksData)) {
+        if (data.subject === subject && id !== excludeId) {
+            found = true;
+            const item = document.createElement('div');
+            item.className = 'similar-card-item';
+            item.onclick = () => openBookDetail(id);
+            item.innerHTML = `
+                <img src="${data.image}" class="similar-card-img" alt="ملف">
+                <div class="similar-card-info">
+                    <h4>${data.title}</h4>
+                    <p>المادة: ${data.subject} • منهج رسمي</p>
+                </div>
+            `;
+            listContainer.appendChild(item);
+        }
+    }
+
+    if (!found) {
+        listContainer.innerHTML = '<p style="font-size: 0.85rem; color: #64748b; text-align: center; margin: 5px 0;">لا توجد ملفات أخرى مشابهة حالياً في هذا القسم.</p>';
+    }
+}
+
+// إدارة التقييمات وتخزينها محلياً
+function getRatingData(bookId) {
+    const saved = localStorage.getItem('rating_' + bookId);
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    return defaultRatings[bookId] || { totalScore: 450, count: 100 };
+}
+
+function updateRatingDisplay(bookId) {
+    const data = getRatingData(bookId);
+    const avg = (data.totalScore / data.count).toFixed(1);
+    const userVote = localStorage.getItem('user_vote_' + bookId);
+
+    const infoText = document.getElementById('ratingInfoText');
+    if (userVote) {
+        infoText.innerHTML = `⭐ تقييمك: ${userVote} نجوم | المتوسط: ${avg} (${data.count} تقييم)`;
+    } else {
+        infoText.innerHTML = `تقييم الطلبة للملف: ${avg} من 5 (${data.count} تقييم) - اضغط لتقييمك`;
+    }
+
+    highlightStars(userVote ? parseInt(userVote) : Math.round(avg));
+}
+
+function highlightStars(rating) {
+    const stars = document.querySelectorAll('#interactiveStars .star');
+    stars.forEach(star => {
+        const val = parseInt(star.getAttribute('data-value'));
+        if (val <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+document.querySelectorAll('#interactiveStars .star').forEach(star => {
+    star.addEventListener('click', function() {
+        if (!currentBookId) return;
+        const ratingVal = parseInt(this.getAttribute('data-value'));
+        
+        let data = getRatingData(currentBookId);
+        let userVote = localStorage.getItem('user_vote_' + currentBookId);
+
+        if (userVote) {
+            data.totalScore = data.totalScore - parseInt(userVote) + ratingVal;
+        } else {
+            data.totalScore += ratingVal;
+            data.count += 1;
+        }
+
+        localStorage.setItem('user_vote_' + currentBookId, ratingVal);
+        localStorage.setItem('rating_' + currentBookId, JSON.stringify(data));
+
+        updateRatingDisplay(currentBookId);
+        alert('شكراً لك! تم تسجيل تقييمك بنجاح ⭐');
+    });
+
+    star.addEventListener('mouseenter', function() {
+        const val = parseInt(this.getAttribute('data-value'));
+        highlightStars(val);
+    });
+});
+
+document.getElementById('interactiveStars').addEventListener('mouseleave', function() {
+    if (currentBookId) {
+        const userVote = localStorage.getItem('user_vote_' + currentBookId);
+        const data = getRatingData(currentBookId);
+        highlightStars(userVote ? parseInt(userVote) : Math.round(data.totalScore / data.count));
+    }
+});
+
+// فحص Deep Linking عند التحميل
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookParam = urlParams.get('book');
+    if (bookParam && booksData[bookParam]) {
+        openBookDetail(bookParam);
+    }
+});
+</script>
+</body>
+</html>
