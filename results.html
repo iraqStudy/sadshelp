@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>النتائج الوزارية - شيرادله السادس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.results-container { max-width: 800px; margin: 20px auto; padding: 0 16px 40px; }
+.results-table-wrap { background: var(--card-bg, #fff); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+.results-table { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Tajawal', sans-serif; }
+.results-table th { background: #f43f5e; color: #fff; padding: 14px 12px; font-size: 1rem; font-weight: 700; }
+.results-table td { padding: 12px; border-bottom: 1px solid #edf2f7; font-size: 0.95rem; color: var(--text-color, #1e293b); vertical-align: middle; }
+.results-table tr:last-child td { border-bottom: none; }
+.results-table tr:hover { background: #f8fafc; }
+.status-badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; color: #fff; }
+.status-uploaded { background: #10b981; }
+.status-announced { background: #0284c7; }
+.download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #15803d; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: background 0.2s, transform 0.2s; box-shadow: 0 2px 5px rgba(21, 128, 61, 0.2); }
+.download-btn:hover { background: #166534; transform: scale(1.05); }
+.results-header-box { text-align: center; margin-bottom: 24px; background: linear-gradient(135deg, #f43f5e, #fb7185); padding: 25px; border-radius: 16px; color: #fff; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.2); }
+.results-header-box h2 { font-size: 1.5rem; margin-bottom: 5px; font-weight: 900; }
+.results-header-box p { font-size: 0.95rem; opacity: 0.9; }
+@media (max-width: 600px) {
+    .results-table th, .results-table td { padding: 10px 6px; font-size: 0.85rem; }
+    .download-btn { padding: 5px 10px; font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo-container" onclick="window.location.href='index.html'">
+<div class="logo-icon"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;"></div>
+<div class="logo-text"><h1>شيرادله</h1><h2>السادس</h2></div>
+</div>
+<div class="header-actions">
+<button class="menu-toggle" onclick="toggleMenu()" title="القائمة"><span></span><span></span><span></span></button>
+</div>
+</header>
+
+<div id="navOverlay" class="nav-overlay" onclick="closeMenu(event)"><div class="nav-drawer" onclick="event.stopPropagation()">
+<div>
+<div class="drawer-header">
+<div class="drawer-brand"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;"><span style="font-weight:900; font-size:1.1rem;">شيرادله السادس</span></div>
+<button class="close-drawer" onclick="toggleMenu()">&times;</button>
+</div>
+<div class="drawer-menu-list">
+<div onclick="window.location.href='index.html';" class="drawer-link"><span>🏠</span> الصفحة الرئيسية</div>
+<div onclick="window.location.href='mdrsen.html';" class="drawer-link"><span>👨‍🏫</span> قائمة المدرسين</div>
+<div onclick="window.location.href='books.html';" class="drawer-link"><span>📚</span> الكتب المنهجية</div>
+<div onclick="window.location.href='malazm.html';" class="drawer-link"><span>📖</span> الملازم</div>
+<div onclick="window.location.href='results.html';" class="drawer-link"><span>🏆</span> النتائج الوزارية</div>
+<div onclick="window.location.href='newiraq.html';" class="drawer-link"><span>📋</span> النسخ الوزارية</div>
+<div onclick="window.location.href='exams.html';" class="drawer-link"><span>📝</span> الامتحانات الوزارية</div>
+</div>
+</div>
+<div><div class="drawer-footer">جميع الحقوق محفوظة © منصة شيرادله السادس</div></div>
+</div></div>
+
+<main>
+<div class="results-container">
+<div class="back-btn-container" style="margin-bottom: 15px;"><button class="back-nav-btn" onclick="window.location.href='index.html'"><span>➔</span> رجوع للرئيسية</button></div>
+
+<div class="results-header-box">
+    <h2>نتائج الامتحانات الوزارية</h2>
+    <p>اختر المحافظة لتحميل أو عرض نتائج السادس الإعدادي الرسمية</p>
+</div>
+
+<div class="results-table-wrap">
+<table class="results-table">
+<thead>
+<tr>
+    <th>المحافظة</th>
+    <th>الحالة</th>
+    <th>التنزيل</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>نينوى</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>ديالى</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الكرخ 1</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الكرخ 2</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الكرخ 3</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الرصافة 1</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الرصافة 2</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>الرصافة 3</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>النجف الأشرف</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>ذي قار</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>القادسية</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>صلاح الدين</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>واسط</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>أربيل</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>السليمانية</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>دهوك</td>
+    <td><span class="status-badge status-announced">تم الاعلان</span></td>
+    <td><a href="#" class="download-btn" style="background:#0284c7;"><span>شاهد</span> 👁️</a></td>
+</tr>
+<tr>
+    <td>الأنبار</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>بابل</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>البصرة</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>كربلاء المقدسة</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>كركوك</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>ميسان</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+<tr>
+    <td>المثنى</td>
+    <td><span class="status-badge status-uploaded">تم الرفع</span></td>
+    <td><a href="#" class="download-btn"><span>تنزيل</span> 📥</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+
+<script>
+function toggleMenu() {
+    const overlay = document.getElementById('navOverlay');
+    if (overlay) {
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+function closeMenu(event) {
+    if (event.target.id === 'navOverlay') {
+        document.getElementById('navOverlay').style.display = 'none';
+    }
+}
+</script>
+
+</body>
+</html>
