@@ -107,106 +107,201 @@ const db = getFirestore(app);
             downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
             
             newBtn.addEventListener('click', () => {
-                updateDoc(bookRef, {
-                    downloads: increment(1)
-                }).catch(() => {
-                    setDoc(bookRef, { views: 1, downloads: 1 }, { merge: true });
-                });
+                setDoc(bookRef, { downloads: increment(1) }, { merge: true }).catch(console.error);
             });
         }
     };
 
-    // --- نظام أساتذة الفرع العلمي (متزامن مع Firebase Firestore) ---
-    let arabicTeachers = [
-        { id: 'aqeel', name: 'الأستاذ عقيل الزبيدي', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/PkVYe5d.jpeg' },
-        { id: 'hussein', name: 'الأستاذ حسين عبيده', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/NGwjU7p.jpeg' },
-        { id: 'hamza', name: 'الأستاذ حمزه الجابري', subject: 'اللغة العربية - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/P7cah0U.jpeg' }
-    ];
+    // --- قاعدة بيانات الأساتذة الشاملة لجميع المواد (24 أستاذ) متزامنة مع Firestore ---
+    const teachersData = {
+        arabic: [
+            { id: 'aqeel', name: 'الأستاذ عقيل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/JM08nuw.jpeg', page: 'teacher-arabic' },
+            { id: 'hussein', name: 'الأستاذ حسين عبيده', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/ftflwlv.jpeg', page: 'teacher-arabic' },
+            { id: 'hamza', name: 'الاستاذ حمزه الجابري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/qJPcFAY.jpeg', page: 'teacher-arabic' },
+            { id: 'rafal_zubaidi', name: 'الست رفل الزبيدي', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/9R3gdou.jpeg', page: 'teacher-arabic' },
+            { id: 'hisham_maamouri', name: 'الاستاذ هشام المعموري', subject: 'اللغة العربية - السادس العلمي', img: 'https://i.imgur.com/Pvm8zbd.jpeg', page: 'teacher-arabic' }
+        ],
+        islamic: [
+            { id: 'khaled_hyali', name: 'الأستاذ خالد الحيالي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/I76Zdb4.jpeg', page: 'teacher-islamic' },
+            { id: 'sajid_akili', name: 'الأستاذ ساجد العكيلي', subject: 'التربية الإسلامية - السادس العلمي', img: 'https://i.imgur.com/GqsUdZW.jpeg', page: 'teacher-islamic' }
+        ],
+        math: [
+            { id: 'haidar_abdulaima', name: 'الأستاذ حيدر عبد الائمة', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/yxbFxrp.jpeg', page: 'teacher-math' },
+            { id: 'haidar_waleed', name: 'الأستاذ حيدر وليد', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/xZIRMx5.jpeg', page: 'teacher-math' },
+            { id: 'mohammed_qasim', name: 'الأستاذ محمد قاسم', subject: 'الرياضيات - السادس العلمي', img: 'https://i.imgur.com/acExwFZ.jpeg', page: 'teacher-math' }
+        ],
+        english: [
+            { id: 'mohammed_obaidi', name: 'الأستاذ محمد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/zUCDQyq.jpeg', page: 'teacher-english' },
+            { id: 'sajjad_obaidi', name: 'الأستاذ سجاد العبيدي', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/bl68sCC.jpeg', page: 'teacher-english' },
+            { id: 'azal_salwan', name: 'الست أزل سلوان', subject: 'اللغة الإنجليزية - السادس العلمي', img: 'https://i.imgur.com/RkxAMUv.jpeg', page: 'teacher-english' }
+        ],
+        biology: [
+            { id: 'salem_mansour', name: 'الأستاذ سالم ال منصور', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/ryqitAT.jpeg', page: 'teacher-biology' },
+            { id: 'mustafa_hafiz', name: 'الأستاذ مصطفى حافظ', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/23ZakX0.jpeg', page: 'teacher-biology' },
+            { id: 'hassan_fallah', name: 'الأستاذ حسن فلاح', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/jvv7wCd.jpeg', page: 'teacher-biology' },
+            { id: 'jaafar_hasani', name: 'الأستاذ جعفر الحسني', subject: 'الأحياء - السادس العلمي', img: 'https://i.imgur.com/uRHxEFM.jpeg', page: 'teacher-biology' }
+        ],
+        chemistry: [
+            { id: 'fadel_hashimi', name: 'الأستاذ فاضل الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/hFKC4G6.jpeg', page: 'teacher-chemistry' },
+            { id: 'hussein_hashimi', name: 'الأستاذ حسين الهاشمي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/oS6ujqX.jpeg', page: 'teacher-chemistry' },
+            { id: 'haidar_abbas', name: 'الأستاذ حيدر عباس', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/umkMkls.jpeg', page: 'teacher-chemistry' },
+            { id: 'hashem_gharbawi', name: 'الأستاذ هاشم الغرباوي', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/y47x9Gy.jpeg', page: 'teacher-chemistry' },
+            { id: 'muhannad_sudani', name: 'الأستاذ مهند السوداني', subject: 'الكيمياء - السادس العلمي', img: 'https://i.imgur.com/Y8yNcaf.jpeg', page: 'teacher-chemistry' }
+        ],
+        physics: [
+            { id: 'hussein_mohammed', name: 'الأستاذ حسين محمد', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/tgoLB13.jpeg', page: 'teacher-physics' },
+            { id: 'moayad_saleem', name: 'الأستاذ مؤيد سليم', subject: 'الفيزياء - السادس العلمي', img: 'https://i.imgur.com/6h9mMeF.jpeg', page: 'teacher-physics' }
+        ]
+    };
 
-    let mathTeachers = [
-        { id: 'haidar_abdulaima', name: 'الأستاذ حيدر عبدالائمه', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/uJ3L9fg.jpeg' },
-        { id: 'haidar_waleed', name: 'الأستاذ حيدر وليد', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/HlvmR5C.jpeg' },
-        { id: 'mohammed_qasim', name: 'الأستاذ محمد قاسم', subject: 'الرياضيات - السادس العلمي', likes: 0, userVote: false, img: 'https://i.imgur.com/kcRf1Vu.jpeg' }
-    ];
-
-    function loadLocalVotesState() {
-        arabicTeachers.forEach(teacher => {
-            teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
-        });
-        mathTeachers.forEach(teacher => {
-            teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
-        });
-    }
-
-    function initFirebaseListeners() {
-        loadLocalVotesState();
+    // مصفوفة البحث الشاملة للأساتذة والمحتوى
+    const searchIndex = [
+        // الأساتذة
+        { title: "الأستاذ عقيل الزبيدي", category: "اللغة العربية", image: "https://i.imgur.com/JM08nuw.jpeg", page: "teacher-arabic" },
+        { title: "الأستاذ حسين عبيده", category: "اللغة العربية", image: "https://i.imgur.com/ftflwlv.jpeg", page: "teacher-arabic" },
+        { title: "الاستاذ حمزه الجابري", category: "اللغة العربية", image: "https://i.imgur.com/qJPcFAY.jpeg", page: "teacher-arabic" },
+        { title: "الست رفل الزبيدي", category: "اللغة العربية", image: "https://i.imgur.com/9R3gdou.jpeg", page: "teacher-arabic" },
+        { title: "الاستاذ هشام المعموري", category: "اللغة العربية", image: "https://i.imgur.com/Pvm8zbd.jpeg", page: "teacher-arabic" },
+        { title: "الأستاذ خالد الحيالي", category: "التربية الإسلامية", image: "https://i.imgur.com/I76Zdb4.jpeg", page: "teacher-islamic" },
+        { title: "الأستاذ ساجد العكيلي", category: "التربية الإسلامية", image: "https://i.imgur.com/GqsUdZW.jpeg", page: "teacher-islamic" },
+        { title: "الأستاذ حيدر عبد الائمة", category: "الرياضيات", image: "https://i.imgur.com/yxbFxrp.jpeg", page: "teacher-math" },
+        { title: "الأستاذ حيدر وليد", category: "الرياضيات", image: "https://i.imgur.com/xZIRMx5.jpeg", page: "teacher-math" },
+        { title: "الأستاذ محمد قاسم", category: "الرياضيات", image: "https://i.imgur.com/acExwFZ.jpeg", page: "teacher-math" },
+        { title: "الأستاذ محمد العبيدي", category: "اللغة الإنجليزية", image: "https://i.imgur.com/zUCDQyq.jpeg", page: "teacher-english" },
+        { title: "الأستاذ سجاد العبيدي", category: "اللغة الإنجليزية", image: "https://i.imgur.com/bl68sCC.jpeg", page: "teacher-english" },
+        { title: "الست أزل سلوان", category: "اللغة الإنجليزية", image: "https://i.imgur.com/RkxAMUv.jpeg", page: "teacher-english" },
+        { title: "الأستاذ سالم ال منصور", category: "الأحياء", image: "https://i.imgur.com/ryqitAT.jpeg", page: "teacher-biology" },
+        { title: "الأستاذ مصطفى حافظ", category: "الأحياء", image: "https://i.imgur.com/23ZakX0.jpeg", page: "teacher-biology" },
+        { title: "الأستاذ حسن فلاح", category: "الأحياء", image: "https://i.imgur.com/jvv7wCd.jpeg", page: "teacher-biology" },
+        { title: "الأستاذ جعفر الحسني", category: "الأحياء", image: "https://i.imgur.com/uRHxEFM.jpeg", page: "teacher-biology" },
+        { title: "الأستاذ فاضل الهاشمي", category: "الكيمياء", image: "https://i.imgur.com/hFKC4G6.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ حسين الهاشمي", category: "الكيمياء", image: "https://i.imgur.com/oS6ujqX.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ حيدر عباس", category: "الكيمياء", categoryName: "الكيمياء", image: "https://i.imgur.com/umkMkls.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ هاشم الغرباوي", category: "الكيمياء", image: "https://i.imgur.com/y47x9Gy.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ مهند السوداني", category: "الكيمياء", image: "https://i.imgur.com/Y8yNcaf.jpeg", page: "teacher-chemistry" },
+        { title: "الأستاذ حسين محمد", category: "الفيزياء", image: "https://i.imgur.com/tgoLB13.jpeg", page: "teacher-physics" },
+        { title: "الأستاذ مؤيد سليم", category: "الفيزياء", image: "https://i.imgur.com/6h9mMeF.jpeg", page: "teacher-physics" },
         
-        arabicTeachers.forEach(teacher => {
-            onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (typeof data.votes === 'number') {
-                        teacher.likes = data.votes;
-                    }
-                } else {
-                    setDoc(doc(db, "teachers", teacher.id), { votes: 0 }).catch(console.error);
-                }
-                renderArabicTeachers();
-            }, (error) => {
-                console.error("خطأ في مزامنة بيانات المدرس:", error);
-            });
-        });
+        // المحتوى والأقسام
+        { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
+        { title: "كتاب الفيزياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "books.html" },
+        { title: "ملزمة الرياضيات الاستاذ حيدر وليد", category: "الملازم", image: "https://i.imgur.com/IcszMVF.jpeg", page: "malazm.html" },
+        { title: "دورة الرياضيات المركزة للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "videos.html" }
+    ];
 
-        mathTeachers.forEach(teacher => {
-            onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (typeof data.votes === 'number') {
-                        teacher.likes = data.votes;
+    window.openSearchModal = function() {
+        const modal = document.getElementById('searchModal');
+        if(modal) modal.style.display = 'flex';
+        const input = document.getElementById('searchInput');
+        if(input) input.focus();
+    };
+
+    window.closeSearchModal = function() {
+        const modal = document.getElementById('searchModal');
+        if(modal) modal.style.display = 'none';
+    };
+
+    window.handleSearchInput = function(e) {
+        const query = e.target.value.trim().toLowerCase();
+        const container = document.getElementById('searchResultsContainer');
+        if (!container) return;
+
+        if (!query) {
+            container.innerHTML = '<div class="search-no-results">اكتب اسم الكتاب، الملزمة، المدرس أو النسخة الوزارية للبحث عنها...</div>';
+            return;
+        }
+
+        const queryWords = query.split(/\s+/);
+        const scoredResults = searchIndex.map(item => {
+            let score = 0;
+            const fullText = (item.title + " " + item.category).toLowerCase();
+            if (fullText.includes(query)) score += 15;
+            queryWords.forEach(word => {
+                if (word.length > 1 && fullText.includes(word)) score += 5;
+            });
+            return { item, score };
+        }).filter(res => res.score > 0);
+
+        scoredResults.sort((a, b) => b.score - a.score);
+        const results = scoredResults.map(res => res.item);
+
+        if (results.length === 0) {
+            container.innerHTML = '<div class="search-no-results">لا توجد نتائج مطابقة لبحثك</div>';
+            return;
+        }
+
+        container.innerHTML = results.map(r => `
+            <div class="search-result-item" onclick="${r.page.endsWith('.html') ? `window.location.href='${r.page}'` : `showPage('${r.page}'); closeSearchModal();`}">
+                <div class="search-result-content-wrap" style="display: flex; align-items: center; gap: 12px;">
+                    <img src="${r.image}" class="search-result-thumb" alt="${r.title}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
+                    <div class="search-result-info" style="display: flex; flexDirection: column;">
+                        <span class="search-result-title" style="font-weight: 700;">${r.title}</span>
+                        <span class="search-result-category" style="font-size: 0.75rem; color: #64748b;">${r.category}</span>
+                    </div>
+                </div>
+                <span>➔</span>
+            </div>
+        `).join('');
+    };
+
+    // --- تهيئة مستمعي التقييمات والتصويتات للأساتذة في الوقت الفعلي عبر Firestore ---
+    const categoriesList = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
+
+    function initFirebaseTeacherListeners() {
+        categoriesList.forEach(cat => {
+            if (!teachersData[cat]) return;
+            
+            teachersData[cat].forEach(teacher => {
+                teacher.votes = 0;
+                teacher.userVote = localStorage.getItem('voted_' + teacher.id) === 'true';
+
+                onSnapshot(doc(db, "teachers", teacher.id), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        teacher.votes = typeof data.votes === 'number' ? data.votes : 0;
+                    } else {
+                        setDoc(doc(db, "teachers", teacher.id), { votes: 0 }, { merge: true }).catch(console.error);
                     }
-                } else {
-                    setDoc(doc(db, "teachers", teacher.id), { votes: 0 }).catch(console.error);
-                }
-                renderMathTeachers();
-            }, (error) => {
-                console.error("خطأ في مزامنة بيانات مدرس الرياضيات:", error);
+                    renderCategoryTeachers(cat);
+                }, (error) => {
+                    console.error("خطأ في مزامنة أصوات المدرس:", error);
+                });
             });
         });
     }
 
-    function renderArabicTeachers() {
-        const container = document.getElementById('arabicTeachersList');
-        if(!container) return;
+    function renderCategoryTeachers(categoryKey) {
+        const container = document.getElementById(categoryKey + 'TeachersList') || document.querySelector('#teacher-' + categoryKey + ' .books-list-container');
+        if (!container || !teachersData[categoryKey]) return;
 
         const cardPositions = {};
         container.querySelectorAll('.teacher-card-item').forEach(card => {
             const id = card.getAttribute('data-id');
-            if (id) {
-                cardPositions[id] = card.getBoundingClientRect();
-            }
+            if (id) cardPositions[id] = card.getBoundingClientRect();
         });
 
-        arabicTeachers.sort((a, b) => b.likes - a.likes);
+        teachersData[categoryKey].sort((a, b) => b.votes - a.votes);
         container.innerHTML = '';
-        
-        arabicTeachers.forEach((teacher, index) => {
+
+        teachersData[categoryKey].forEach((teacher, index) => {
             let rankText = `المرتبة #${index + 1}`;
             let rankClass = 'rank-third';
-            
-            if(index === 0) {
+
+            if (index === 0) {
                 rankText = `👑 الأول على المادة`;
                 rankClass = 'rank-first';
-            } else if(index === 1) {
+            } else if (index === 1) {
                 rankText = `⭐ المرتبة #2`;
                 rankClass = 'rank-second';
-            } else if(index === 2) {
+            } else if (index === 2) {
                 rankText = `🥉 المرتبة #3`;
                 rankClass = 'rank-third';
             }
-            
+
             const card = document.createElement('div');
-            card.className = 'teacher-card-item';
+            card.className = 'teacher-card-item book-card-item';
             card.setAttribute('data-id', teacher.id);
+            card.setAttribute('data-teacher-id', teacher.id);
             card.innerHTML = `
                 <div class="teacher-info-side">
                     <div class="teacher-rank-badge ${rankClass}">${rankText}</div>
@@ -216,8 +311,8 @@ const db = getFirestore(app);
                         <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
                     </div>
                     <div class="voting-actions-row" style="margin-top: 10px;">
-                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" onclick="voteTeacher('${teacher.id}')">
-                            👍 لايك <span class="vote-count">(${teacher.likes})</span>
+                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" id="vote-btn-${teacher.id}" onclick="voteTeacher('${teacher.id}')" style="${teacher.userVote ? 'background: #059669;' : ''}">
+                            👍 <span id="vote-text-${teacher.id}">${teacher.userVote ? 'تم التصويت ✓ (إلغاء)' : 'تصويت'}</span> <span class="vote-count" id="votes-count-${teacher.id}">(${teacher.votes})</span>
                         </button>
                     </div>
                 </div>
@@ -231,82 +326,9 @@ const db = getFirestore(app);
             if (oldPos) {
                 const newPos = card.getBoundingClientRect();
                 const deltaY = oldPos.top - newPos.top;
-                
                 if (deltaY !== 0) {
                     card.style.transform = `translateY(${deltaY}px)`;
                     card.style.transition = 'none';
-                    
-                    requestAnimationFrame(() => {
-                        card.style.transform = '';
-                        card.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-                    });
-                }
-            }
-        });
-    }
-
-    function renderMathTeachers() {
-        const container = document.getElementById('mathTeachersList');
-        if(!container) return;
-
-        const cardPositions = {};
-        container.querySelectorAll('.teacher-card-item').forEach(card => {
-            const id = card.getAttribute('data-id');
-            if (id) {
-                cardPositions[id] = card.getBoundingClientRect();
-            }
-        });
-
-        mathTeachers.sort((a, b) => b.likes - a.likes);
-        container.innerHTML = '';
-        
-        mathTeachers.forEach((teacher, index) => {
-            let rankText = `المرتبة #${index + 1}`;
-            let rankClass = 'rank-third';
-            
-            if(index === 0) {
-                rankText = `👑 الأول على المادة`;
-                rankClass = 'rank-first';
-            } else if(index === 1) {
-                rankText = `⭐ المرتبة #2`;
-                rankClass = 'rank-second';
-            } else if(index === 2) {
-                rankText = `🥉 المرتبة #3`;
-                rankClass = 'rank-third';
-            }
-            
-            const card = document.createElement('div');
-            card.className = 'teacher-card-item';
-            card.setAttribute('data-id', teacher.id);
-            card.innerHTML = `
-                <div class="teacher-info-side">
-                    <div class="teacher-rank-badge ${rankClass}">${rankText}</div>
-                    <div class="teacher-main-title">${teacher.name}</div>
-                    <div class="teacher-meta-list" style="margin-top: 6px;">
-                        <div class="teacher-meta-row"><span>المادة:</span> <strong>${teacher.subject}</strong></div>
-                        <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
-                    </div>
-                    <div class="voting-actions-row" style="margin-top: 10px;">
-                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" onclick="voteTeacher('${teacher.id}')">
-                            👍 لايك <span class="vote-count">(${teacher.likes})</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="teacher-avatar-side">
-                    <img src="${teacher.img}" alt="${teacher.name}" class="teacher-avatar-img">
-                </div>
-            `;
-            container.appendChild(card);
-
-            const oldPos = cardPositions[teacher.id];
-            if (oldPos) {
-                const newPos = card.getBoundingClientRect();
-                const deltaY = oldPos.top - newPos.top;
-                
-                if (deltaY !== 0) {
-                    card.style.transform = `translateY(${deltaY}px)`;
-                    card.style.transition = 'none';
-                    
                     requestAnimationFrame(() => {
                         card.style.transform = '';
                         card.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -317,7 +339,16 @@ const db = getFirestore(app);
     }
 
     window.voteTeacher = async function(teacherId) {
-        const targetTeacher = arabicTeachers.find(t => t.id === teacherId) || mathTeachers.find(t => t.id === teacherId);
+        let targetTeacher = null;
+        let foundCategory = '';
+        for (let cat of categoriesList) {
+            const found = teachersData[cat].find(t => t.id === teacherId);
+            if (found) {
+                targetTeacher = found;
+                foundCategory = cat;
+                break;
+            }
+        }
         if (!targetTeacher) return;
 
         const hasVoted = localStorage.getItem('voted_' + teacherId) === 'true';
@@ -325,21 +356,21 @@ const db = getFirestore(app);
 
         try {
             if (hasVoted) {
-                await updateDoc(teacherRef, { votes: increment(-1) });
+                await setDoc(teacherRef, { votes: increment(-1) }, { merge: true });
                 localStorage.removeItem('voted_' + teacherId);
                 targetTeacher.userVote = false;
             } else {
-                await updateDoc(teacherRef, { votes: increment(1) });
+                await setDoc(teacherRef, { votes: increment(1) }, { merge: true });
                 localStorage.setItem('voted_' + teacherId, 'true');
                 targetTeacher.userVote = true;
             }
+            renderCategoryTeachers(foundCategory);
         } catch (error) {
-            console.error("خطأ في تحديث التصويت السحابي:", error);
+            console.error("خطأ في تحديث التصويت:", error);
             alert("فشل تحديث الصوت، تحقق من الاتصال بالإنترنت.");
         }
     };
 
-    // [مصحح] تم إضافة الوسيط element لتجنب خطأ الـ Strict Mode
     window.filterItems = function(sectionType, subjectName, element) {
         let containerId = '';
         if(sectionType === 'books') containerId = 'booksListContainer';
@@ -370,7 +401,7 @@ const db = getFirestore(app);
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-        initFirebaseListeners();
+        initFirebaseTeacherListeners();
     });
 
     let pageHistory = ['home'];
@@ -401,19 +432,9 @@ const db = getFirestore(app);
             document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
             document.getElementById(previousPage)?.classList.add('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
-            if(['home', 'teachers-page', 'books-page', 'mlazem-page', 'ministerial-copies-page', 'chats-page', 'notifications-page', 'courses-page', 'ministerial-page'].includes(previousPage)) {
-                document.querySelectorAll('.side-nav-item').forEach(item => {
-                    if(item.getAttribute('data-page') === previousPage) {
-                        item.classList.add('active');
-                    } else {
-                        item.classList.remove('active');
-                    }
-                });
-            }
         }
     };
 
-    // [مصحح] إضافة فحوصات الأمان للعناصر لتجنب توقف السكربت
     window.toggleMenu = function() {
         const overlay = document.getElementById('navOverlay');
         const floatingContainer = document.getElementById('floatingContainer');
@@ -450,6 +471,10 @@ const db = getFirestore(app);
             const popup = document.getElementById('floatingMenuPopup');
             if(popup) popup.classList.remove('active');
         }
+        const searchModal = document.getElementById('searchModal');
+        if(e.target === searchModal) {
+            closeSearchModal();
+        }
     });
 
     window.toggleAIChat = function() {
@@ -469,7 +494,7 @@ const db = getFirestore(app);
                 let customBrain = JSON.parse(localStorage.getItem('ai_iraqi_sixth_brain')) || {};
                 customBrain[key] = val;
                 localStorage.setItem('ai_iraqi_sixth_brain', JSON.stringify(customBrain));
-                return `🚀 ممتاز يا مصطفى! تم تحديث ذاكرتي وحفظ هذه المعلومة بنجاح في قاعدة البيانات التخصصية للسادس الإعدادي.`;
+                return `🚀 تم تحديث ذاكرتي وحفظ هذه المعلومة بنجاح يا مصطفى.`;
             } else {
                 return `صيغة التعلم الصحيحة:\nتعلم: [السؤال] = [الإجابة]`;
             }
@@ -482,51 +507,15 @@ const db = getFirestore(app);
             }
         }
 
-        if (text.includes('مواد') || text.includes('كم مادة') || text.includes('ايش قد مواد')) {
-            return `📚 مواد السادس الإعدادي (الفرع العلمي) في العراق تتكون من 7 مواد أساسية (+ اللغة الفرنسية كمادة اختيارية ثانية):\n1. التربية الإسلامية\n2. اللغة العربية (قواعد وأدب)\n3. اللغة الإنجليزية (8 وحدات)\n4. الرياضيات (6 فصول)\n5. الفيزياء (11 فصل)\n6. الكيمياء (8 فصول)\n7. الأحياء (5 فصول للإحيائي)\n8. اللغة الفرنسية (اللغة الأجنبية الثانية).`;
+        if (text.includes('مواد') || text.includes('كم مادة')) {
+            return `📚 مواد السادس الإعدادي (الفرع العلمي) في العراق تتكون من 7 مواد أساسية:\n1. التربية الإسلامية\n2. اللغة العربية\n3. اللغة الإنجليزية\n4. الرياضيات\n5. الفيزياء\n6. الكيمياء\n7. الأحياء.`;
         }
 
-        if (text.includes('رياضيات') || text.includes('فصول الرياضيات')) {
-            return `📐 منهج الرياضيات للسادس العلمي يتكون من 6 فصول رئيسية:\n• الفصل الأول: الأعداد المركبة.\n• الفصل الثاني: القطوع المخروطية.\n• الفصل الثالث: التفاضل وتطبيقاته (المعدلات الزمنية، التقرير، التزايد والتناقص، الرسم).\n• الفصل الرابع: التكامل وتطبيقاته (المحدد وغير المحدد، المساحات).\n• الفصل الخامس: المعادلات التفاضلية العادية.\n• الفصل السادس: تطبيقات علمية (أو الهندسة حسب التقليص الوزاري).`;
+        if (text.includes('مرحبا') || text.includes('هلا') || text.includes('أهلا')) {
+            return `أهلاً بك يا مصطفى! كيف يمكنني مساعدتك في تطوير المنصة أو مراجعة المناهج اليوم؟`;
         }
 
-        if (text.includes('فيزياء') || text.includes('فصول الفيزياء')) {
-            return `⚡ منهج الفيزياء للسادس العلمي يتكون من 11 فصلاً:\n1. المتجهات والحث الكهرومغناطيسي.\n2. الحث المتبادل والذاتي.\n3. التيار المتناوب والدوائر المهتزة.\n4. الموجات الكهرومغناطيسية.\n5. البصريات الفيزيائية (التداخل والحيود).\n6. الفيزياء الحديثة (النسبية، أينشتاين).\n7. إلكترونيات الحالة الصلبة والدوائر المتكاملة.\n8. الأطياف الذرية والليزر.\n9. النوى الذرية والنشاط الإشعاعي.\n10 & 11. الفصول الخاصة بالتقليصات أو التطبيقي/الإحيائي.`;
-        }
-
-        if (text.includes('كيمياء') || text.includes('فصول الكيمياء')) {
-            return `🧪 منهج الكيمياء للسادس العلمي يتكون من 8 فصول:\n• الفصل الأول: علم الثرمودايناميك.\n• الفصل الثاني: الاتزان الكيميائي.\n• الفصل الثالث: الاتزان الأيوني (الحوامض والقواعد).\n• الفصل الرابع: الكيمياء الكهربائية.\n• الفصل الخامس: الكيمياء التناسقية.\n• الفصل السادس: التحليل الكيميائي.\n• الفصل السابع: الكيمياء العضوية.\n• الفصل الثامن: الكيمياء الصناعية.`;
-        }
-
-        if (text.includes('احياء') || text.includes('أحياء') || text.includes('فصول الأحياء')) {
-            return `🧬 منهج الأحياء للسادس العلمي (الإحيائي) يتكون من 5 فصول جوهرية:\n• الفصل الأول: الخلية (تركيبها، العضيات، الانقسام الخلوي).\n• الفصل الثاني: النسيج (الأنسجة النباتية والحيوانية).\n• الفصل الثالث: التكاثر (في النباتات والحيوانات والإنسان).\n• الفصل الرابع: التكوين الجنيني.\n• الفصل الخامس: الوراثة (مندل، المورثات المميتة، المجاميع الدموية، الخريطة الجينية).`;
-        }
-
-        if (text.includes('عربي') || text.includes('قواعد العربي') || text.includes('أدب')) {
-            return `📖 منهج اللغة العربية للسادس الإعدادي ينقسم إلى قسمين رئيسيين:\n1. القواعد (تضم مواضيع: الاستفهام، النفي، الاستثناء، التقديم والتاخير، التوكيد، النداء، التعجب، المدح والذم، الخصائص).\n2. الأدب والنصوص (يضم الشعر الحديث، المدارس الشعرية مثل الديوان، المهجر، الإحياء، النثر، القصائد المطلوبة للحفظ، وحياة الشعراء).`;
-        }
-
-        if (text.includes('فرنسي') || text.includes('فرنساوي') || text.includes('لغة فرنسية')) {
-            return `🇫🇷 منهج اللغة الفرنسية للسادس الإعدادي في العراق:\n• يعتبر الفرنسية اللغة الأجنبية الثانية (بديل التركية أو الفارسية في بعض المدارس الأهلية أو الحكومية).\n• يتكون المنهج من وحدات دراسية (Unité 1 إلى Unité 6 تقريباً).\n• يركز على: قواعد اللغة (La Grammaire)، تصريف الأفعال (Les Verbes)، القطع الاستيعابية (Les Comprehensions)، الإنشاءات (Les Productions écrites)، والمفردات والأسئلة الوزارية المهمة.\nهل تحتاج إلى ملخص أو قاعدة معينة في الفرنسية يا مصطفى؟`;
-        }
-
-        if (text.includes('انكليزي') || text.includes('إنجليزي') || text.includes('units')) {
-            return `🇬🇧 منهج اللغة الإنجليزية للسادس الإعدادي يتكون من 8 وحدات (Units 1 to 8)، وتتضمن:\n• القواعد (Grammar) لكل وحدة.\n• المفردات والإملاء (Vocabulary & Spelling).\n• القطع الاستيعابية (Reading Comprehensions).\n• القصص المقررة (Literature Spotlight مثل قصة The Canary).\n• الإنشاءات (Writing) لكل وحدة وزارية.`;
-        }
-
-        if (text.includes('مرحبا') || text.includes('هلا') || text.includes('أهلا') || text.includes('سلام')) {
-            return `أهلاً بك يا مصطفى! بصفتي خبيرك الذكي في منهج السادس الإعدادي في العراق، أنا جاهز لإجابتك عن أي مادة، عدد فصول، مواضيع داخلية، وزاريات، أو قواعد فرنسية وإنجليزية. ماذا تريد أن تراجع اليوم؟`;
-        }
-
-        if (text.includes('كيف حالك') || text.includes('شلونك')) {
-            return `بأعلى جاهزية تامة يا مصطفى! أمتلك كامل معلومات المناهج العراقية للسادس الإعدادي. كيف أستطيع خدمتك الآن؟`;
-        }
-
-        if (text.includes('برمجة') || text.includes('كود') || text.includes('html') || text.includes('css') || text.includes('javascript')) {
-            return `بما أنك تطور منصة "شيرادله السادس"، يمكنني مساعدتك في أي كود جافاسكريبت، تنظيم الـ LocalStorage، أو تحسين الواجهات البرمجية للموقع فوراً. ما هي المشكلة البرمجية التي تواجهك؟`;
-        }
-
-        return `سؤال ذكي جداً يا مصطفى! بصفتي النظام الذكي الشامل لمنصتك والمطلع على تفاصيل المنهج العراقي للسادس الإعدادي، يمكننا تحليل هذا الموضوع من كافة الزوايا. \n\nإذا أردت تعليمي إجابة مخصصة لهذا السؤال لتنضم إلى ذاكرتي الدائمة، اكتب لي:\nتعلم: ${rawText} = [الجواب المناسب]\nأو أخبرني بالتفصيل لنناقشه معاً!`;
+        return `سؤال رائع يا مصطفى! إذا أردت تعليمي إجابة مخصصة لهذا السؤال، اكتب لي:\nتعلم: ${rawText} = [الجواب المناسب]`;
     }
 
     window.sendAIMessage = function() {
