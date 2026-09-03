@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الإعدادات - شيرادله السادس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+@keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.search-toggle-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; color: var(--text-color, #1e293b); transition: background 0.2s; }
+.search-toggle-btn:hover { background: rgba(0,0,0,0.05); }
+.search-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: flex-start; padding-top: 80px; animation: modalPop 0.2s ease; }
+.search-modal-box { background: var(--card-bg, #fff); width: 90%; max-width: 600px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; max-height: 80vh; border: 1px solid #e2e8f0; }
+.search-input-wrapper { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; gap: 12px; }
+.search-modal-input { flex: 1; border: none; background: transparent; font-size: 1.1rem; font-family: 'Tajawal', sans-serif; color: var(--text-color, #1e293b); outline: none; }
+.search-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted, #64748b); padding: 0 5px; }
+.search-results-container { overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 400px; }
+.search-result-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: #fff; border: 1px solid #edf2f7; text-decoration: none; color: inherit; transition: all 0.2s; cursor: pointer; }
+.search-result-item:hover { background: #f1f5f9; border-color: #cbd5e1; transform: translateX(-3px); }
+.search-result-content-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+.search-result-thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid #e2e8f0; }
+.search-result-info { display: flex; flex-direction: column; gap: 2px; }
+.search-result-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
+.search-result-category { font-size: 0.75rem; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 6px; width: fit-content; }
+.search-no-results { text-align: center; padding: 30px; color: #64748b; font-size: 0.95rem; }
+
+/* إعدادات القسم الحديثة */
+.settings-section-title { font-size: 1.05rem; font-weight: 700; color: var(--text-color, #1e293b); margin: 24px 0 12px 0; text-align: inherit; }
+.settings-card { background: var(--card-bg, #fff); border-radius: 20px; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; margin-bottom: 12px; }
+.setting-item-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; }
+.setting-item-row:not(:last-child) { border-bottom: 1px solid #f1f5f9; padding-bottom: 14px; }
+.setting-info-group { display: flex; align-items: center; gap: 14px; }
+
+/* تصميم الأيقونات الحديثة والواقعية */
+.setting-icon-box { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+.icon-about { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7; }
+.icon-security { background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); color: #9333ea; }
+.icon-help { background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); color: #0d9488; }
+.icon-contact { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb; }
+
+.setting-text-wrap { display: flex; flex-direction: column; }
+.setting-title { font-weight: 700; font-size: 0.95rem; color: var(--text-color, #1e293b); }
+.setting-subtext { font-size: 0.85rem; color: #64748b; margin-top: 2px; }
+.setting-arrow { color: #94a3b8; font-size: 1rem; transition: transform 0.2s; }
+
+/* الوضع الداكن (Dark Mode) */
+body.dark-mode {
+    background-color: #0f172a;
+    color: #f8fafc;
+    --card-bg: #1e293b;
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+}
+body.dark-mode .settings-card,
+body.dark-mode .search-modal-box,
+body.dark-mode .search-result-item {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+body.dark-mode .search-result-title { color: #f8fafc; }
+body.dark-mode .search-input-wrapper { background-color: #0f172a; border-color: #334155; }
+body.dark-mode .search-modal-input { color: #f8fafc; }
+body.dark-mode .setting-item-row:not(:last-child) { border-color: #334155; }
+body.dark-mode .setting-title { color: #f8fafc; }
+body.dark-mode .setting-subtext { color: #94a3b8; }
+</style>
+</head>
+<body>
+<nav class="side-nav-bar"><div class="side-nav-links">
+<div class="side-nav-item" onclick="window.location.href='index.html'" data-page="home"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>الرئيسية</span></div>
+<div class="side-nav-item" onclick="window.location.href='mdrsen.html'" data-page="teachers-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg><span>المدرسين</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html#chats-page'" data-page="chats-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg><span>سوالف</span></div>
+<div class="side-nav-item" onclick="window.location.href='index.html#notifications-page'" data-page="notifications-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>الإشعارات</span></div>
+<div class="side-nav-item active" onclick="window.location.href='settings.html'" data-page="settings-page"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36.25c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c-.22.08-.47 0-.59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span>الإعدادات</span></div>
+</div></nav>
+
+<header>
+<div class="logo-container" onclick="window.location.href='index.html'">
+<div class="logo-icon"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;"></div>
+<div class="logo-text"><h1>شيرادله</h1><h2>السادس</h2></div>
+</div>
+<div class="header-actions">
+<button class="search-toggle-btn" onclick="openSearchModal()" title="بحث"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+<button class="menu-toggle" onclick="toggleMenu()" title="القائمة"><span></span><span></span><span></span></button>
+</div>
+</header>
+
+<div id="navOverlay" class="nav-overlay" onclick="closeMenu(event)"><div class="nav-drawer" onclick="event.stopPropagation()">
+<div>
+<div class="drawer-header">
+<div class="drawer-brand"><img src="https://i.imgur.com/sM7xbQT.jpeg" alt="شيرادله السادس" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;"><span style="font-weight:900; font-size:1.1rem;">شيرادله السادس</span></div>
+<button class="close-drawer" onclick="toggleMenu()">&times;</button>
+</div>
+<div class="drawer-menu-list">
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>🏠</span> <span>الصفحة الرئيسية</span></div>
+<div onclick="window.location.href='mdrsen.html'; toggleMenu();" class="drawer-link"><span>👨‍🏫</span> <span>قائمة المدرسين</span></div>
+<div onclick="window.location.href='books.html'; toggleMenu();" class="drawer-link"><span>📚</span> <span>الكتب المنهجية</span></div>
+<div onclick="window.location.href='malazm.html'; toggleMenu();" class="drawer-link"><span>📖</span> <span>الملازم</span></div>
+<div onclick="window.location.href='results.html'; toggleMenu();" class="drawer-link"><span>🏆</span> <span>النتائج الوزارية</span></div>
+<div onclick="window.location.href='newiraq.html'; toggleMenu();" class="drawer-link"><span>📋</span> <span>النسخ الوزارية</span></div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>💬</span> <span>سوالف</span></div>
+<div onclick="window.location.href='videos.html'; toggleMenu();" class="drawer-link"><span>💻</span> <span>الدورات الإلكترونية</span></div>
+<div onclick="window.location.href='exams.html'; toggleMenu();" class="drawer-link"><span>📝</span> <span>الامتحانات الوزارية</span></div>
+<div onclick="window.location.href='index.html'; toggleMenu();" class="drawer-link"><span>🔔</span> <span>مركز الإشعارات</span></div>
+<div onclick="window.location.href='settings.html'; toggleMenu();" class="drawer-link"><span>⚙️</span> <span>الإعدادات</span></div>
+</div>
+</div>
+<div><div class="drawer-footer">جميع الحقوق محفوظة © منصة شيرادله السادس</div></div>
+</div></div>
+
+<main>
+<div id="settings-page" class="page-view active" data-parent="home">
+<div class="back-btn-container"><button class="back-nav-btn" onclick="window.location.href='index.html'"><span style="display:inline-block; transform: scaleX(-1);">➔</span> <span>رجوع للخلف</span></button></div>
+<div class="page-header">
+<h2 class="page-title">⚙️ الإعدادات</h2>
+<p class="page-subtitle">تخصيص إعدادات التطبيق وتفضيلات الحساب</p>
+</div>
+
+<!-- إعدادات التطبيق -->
+<div class="settings-section-title">إعدادات التطبيق</div>
+<div class="settings-card">
+<!-- زر من نحن -->
+<div class="setting-item-row" onclick="openAboutModal()">
+<div class="setting-info-group">
+<div class="setting-icon-box icon-about">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+</div>
+<div class="setting-text-wrap">
+<span class="setting-title">من نحن</span>
+<span class="setting-subtext">تعرف على منصة شيرادله السادس المخصصة لطلاب الإعدادي</span>
+</div>
+</div>
+<span class="setting-arrow">❮</span>
+</div>
+
+<!-- زر الأمان والخصوصية -->
+<div class="setting-item-row" onclick="openSecurityModal()">
+<div class="setting-info-group">
+<div class="setting-icon-box icon-security">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+</div>
+<div class="setting-text-wrap">
+<span class="setting-title">الأمان والخصوصية</span>
+<span class="setting-subtext">إدارة إعدادات الأمان وحماية البيانات الشخصية</span>
+</div>
+</div>
+<span class="setting-arrow">❮</span>
+</div>
+</div>
+
+<!-- الدعم -->
+<div class="settings-section-title">الدعم</div>
+<div class="settings-card">
+<div class="setting-item-row" onclick="window.location.href='https://t.me/vxcznvbot'">
+<div class="setting-info-group">
+<div class="setting-icon-box icon-help">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+</div>
+<span class="setting-title">تواصل مع الدعم الفني</span>
+</div>
+<span class="setting-arrow">❮</span>
+</div>
+<div class="setting-item-row" onclick="window.location.href='https://t.me/C_3_F'">
+<div class="setting-info-group">
+<div class="setting-icon-box icon-contact">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+</div>
+<span class="setting-title">تواصل مع المطور</span>
+</div>
+<span class="setting-arrow">❮</span>
+</div>
+</div>
+
+</div>
+</main>
+
+<!-- نافذة "من نحن" -->
+<div id="aboutModal" class="search-modal-overlay">
+<div class="search-modal-box" onclick="event.stopPropagation()" style="max-width: 580px; border-radius: 24px;">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; color: #0284c7;">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+</div>
+<h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-color, #1e293b); margin:0;">من نحن - شيرادله السادس</h3>
+</div>
+<button class="search-close-btn" onclick="closeAboutModal()">&times;</button>
+</div>
+<div style="padding: 24px; overflow-y: auto; max-height: 65vh; display: flex; flex-direction: column; gap: 16px; color: var(--text-muted, #475569); font-size: 0.95rem; line-height: 1.8;">
+<p>أهلاً بك عزيزي الطالب، عزيزتي الطالبة في <strong>منصة شيرادله السادس</strong>، المنصة التعليمية الأولى والاحترافية المصممة حصرياً لتكون رفيق دربك طوال رحلة <strong>السادس الإعدادي</strong> (العلمي والأدبي) في العراق.</p>
+<p>ندرك تماماً مدى أهمية هذه السنة الدراسية الفاصلة في مسيرتك الأكاديمية، ولذلك صممنا هذه المنصة لتختصر عليك الجهد والوقت وتوفر لك كل ما تحتاجه في مكان واحد:</p>
+<div style="display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02); padding: 14px 18px; border-radius: 14px; border: 1px solid #e2e8f0;">
+<div style="display: flex; align-items: center; gap: 10px;"><span>📚</span> <strong>الكتب المنهجية الرسمية:</strong> أحدث المناهج الدراسية المعتمدة لعام 2026.</div>
+<div style="display: flex; align-items: center; gap: 10px;"><span>📖</span> <strong>الملازم والمذكرات:</strong> أفضل وأشمل الملازم لأبرز أساتذة العراق.</div>
+<div style="display: flex; align-items: center; gap: 10px;"><span>💻</span> <strong>الدورات الإلكترونية:</strong> شروحات مركزة وواضحة لجميع المواد لضمان فهم المادة بعمق.</div>
+<div style="display: flex; align-items: center; gap: 10px;"><span>🏆</span> <strong>النسخ والنتائج الوزارية:</strong> أرشفة كاملة للأسئلة الوزارية والتمهيدية مع الحلول النموذجية.</div>
+</div>
+<p style="margin-top: 4px; font-weight: 700; color: #2563eb; text-align: center;">هدفنا الأول والأخير هو دعمك للوصول إلى حلمك وتحقيق أعلى المعدلات والقبول في الكلية التي تتمناها!</p>
+
+<!-- إجمالي عدد الزوار يبدأ من صفر -->
+<div style="margin-top: 10px; padding-top: 14px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.95rem; font-weight: 700; color: var(--text-color, #1e293b);">
+<span>👥 إجمالي عدد الزوار:</span>
+<span id="visitorCountDisplay" style="background: #e0f2fe; color: #0284c7; padding: 4px 14px; border-radius: 10px; font-weight: 900; font-size: 1.05rem;">0</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- نافذة "الأمان والخصوصية" -->
+<div id="securityModal" class="search-modal-overlay">
+<div class="search-modal-box" onclick="event.stopPropagation()" style="max-width: 580px; border-radius: 24px;">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #f3e8ff; display: flex; align-items: center; justify-content: center; color: #9333ea;">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+</div>
+<h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-color, #1e293b); margin:0;">الأمان والخصوصية - شيرادله السادس</h3>
+</div>
+<button class="search-close-btn" onclick="closeSecurityModal()">&times;</button>
+</div>
+<div style="padding: 24px; overflow-y: auto; max-height: 65vh; display: flex; flex-direction: column; gap: 16px; color: var(--text-muted, #475569); font-size: 0.95rem; line-height: 1.8;">
+<p>حرصاً منا على أمان حسابك وبياناتك الشخصية في <strong>منصة شيرادله السادس</strong>، نلتزم بحماية خصوصيتك وفق أعلى معايير الأمان الرقمي.</p>
+<div style="display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02); padding: 14px 18px; border-radius: 14px; border: 1px solid #e2e8f0;">
+<div style="display: flex; align-items: center; gap: 10px;"><span>🔒</span> <strong>تشفير البيانات:</strong> جميع بيانات التصفح والبحث والاشتراكات مشفرة بالكامل.</div>
+<div style="display: flex; align-items: center; gap: 10px;"><span>🛡️</span> <strong>حماية الخصوصية:</strong> لا نشارك أي معلومات شخصية أو تفضيلات دراسية مع أي طرف ثالث.</div>
+<div style="display: flex; align-items: center; gap: 10px;"><span>📱</span> <strong>التفضيلات المحفوظة:</strong> يتم حفظ إعدادات التطبيق والمظهر محلياً على جهازك فقط.</div>
+</div>
+<p style="margin-top: 4px; font-weight: 700; color: #9333ea; text-align: center;">نعمل دائماً لضمان بيئة تعليمية آمنة وموثوقة لجميع طلابنا الأعزاء.</p>
+</div>
+</div>
+</div>
+
+<div id="searchModal" class="search-modal-overlay">
+<div class="search-modal-box" onclick="event.stopPropagation()">
+<div class="search-input-wrapper">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="#64748b"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+<input type="text" id="searchInput" class="search-modal-input" placeholder="ابحث عن كتاب، ملزمة، دورة، أو نسخة وزارية..." oninput="handleSearchInput(event)">
+<button class="search-close-btn" onclick="closeSearchModal()">&times;</button>
+</div>
+<div id="searchResultsContainer" class="search-results-container">
+<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو النسخة الوزارية للبحث عنها...</div>
+</div>
+</div>
+</div>
+
+<script>
+function toggleMenu() {
+    const overlay = document.getElementById('navOverlay');
+    if (overlay) {
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function closeMenu(event) {
+    if (event.target.id === 'navOverlay') {
+        document.getElementById('navOverlay').style.display = 'none';
+    }
+}
+
+function openSearchModal() {
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').focus();
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
+}
+
+function openAboutModal() {
+    document.getElementById('aboutModal').style.display = 'flex';
+    updateVisitorCount();
+}
+
+function closeAboutModal() {
+    document.getElementById('aboutModal').style.display = 'none';
+}
+
+function openSecurityModal() {
+    document.getElementById('securityModal').style.display = 'flex';
+}
+
+function closeSecurityModal() {
+    document.getElementById('securityModal').style.display = 'none';
+}
+
+// دالة تحديث وعرض إجمالي عدد الزوار (يبدأ من صفر)
+function updateVisitorCount() {
+    let count = localStorage.getItem('sadshelp_visitor_count');
+    if (count === null) {
+        count = 0; // يبدأ من صفر تماماً
+    } else {
+        count = parseInt(count);
+    }
+
+    // زيادة العداد مرة واحدة لكل جلسة متصفح جديدة
+    if (!sessionStorage.getItem('sadshelp_visit_counted')) {
+        count++;
+        localStorage.setItem('sadshelp_visitor_count', count);
+        sessionStorage.setItem('sadshelp_visit_counted', 'true');
+    }
+
+    document.getElementById('visitorCountDisplay').textContent = count;
+}
+
+window.addEventListener('click', function(event) {
+    const searchModal = document.getElementById('searchModal');
+    const aboutModal = document.getElementById('aboutModal');
+    const securityModal = document.getElementById('securityModal');
+    if (event.target === searchModal) {
+        closeSearchModal();
+    }
+    if (event.target === aboutModal) {
+        closeAboutModal();
+    }
+    if (event.target === securityModal) {
+        closeSecurityModal();
+    }
+});
+
+const searchIndex = [
+    { title: "كتاب الرياضيات السادس العلمي 2026", category: "الكتب المنهجية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "books.html" },
+    { title: "كتاب الفيزياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "books.html" },
+    { title: "كتاب الكيمياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "books.html" },
+    { title: "كتاب الأحياء السادس العلمي", category: "الكتب المنهجية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "books.html" },
+    { title: "ملزمة الرياضيات الاستاذ حيدر وليد", category: "الملازم", image: "https://i.imgur.com/IcszMVF.jpeg", page: "malazm.html" },
+    { title: "ملزمة الفيزياء السادس العلمي الأستاذ حسن عبد الكاظم", category: "الملازم", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "malazm.html" },
+    { title: "ملزمة الكيمياء الشاملة السادس العلمي", category: "الملازم", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "malazm.html" },
+    { title: "دورة الرياضيات المركزة للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "videos.html" },
+    { title: "دورة الفيزياء الشاملة - المنهج كامل", category: "الدورات الإلكترونية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "videos.html" },
+    { title: "دورة الأحياء الأساسية للسادس العلمي", category: "الدورات الإلكترونية", image: "https://i.imgur.com/sM7xbQT.jpeg", page: "videos.html" },
+    { title: "النسخة الوزارية رياضيات دور أول 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/IcszMVF.jpeg", page: "newiraq.html" },
+    { title: "النسخة الوزارية فيزياء دور ثاني 2025", category: "النسخ الوزارية", image: "https://i.imgur.com/7Tw9QFc.jpeg", page: "newiraq.html" },
+    { title: "النسخة الوزارية كيمياء تمهيدي 2026", category: "النسخ الوزارية", image: "https://i.imgur.com/nGVH3yL.jpeg", page: "newiraq.html" }
+];
+
+function handleSearchInput(e) {
+    const query = e.target.value.trim().toLowerCase();
+    const container = document.getElementById('searchResultsContainer');
+    
+    if (!query) {
+        container.innerHTML = `<div class="search-no-results">اكتب اسم الكتاب، الملزمة، الدورة أو النسخة الوزارية للبحث عنها...</div>`;
+        return;
+    }
+
+    const queryWords = query.split(/\s+/);
+    const scoredResults = searchIndex.map(item => {
+        let score = 0;
+        const fullText = (item.title + " " + item.category).toLowerCase();
+        if (fullText.includes(query)) score += 15;
+        queryWords.forEach(word => {
+            if (word.length > 1 && fullText.includes(word)) score += 5;
+        });
+        return { item, score };
+    }).filter(res => res.score > 0);
+
+    scoredResults.sort((a, b) => b.score - a.score);
+    const results = scoredResults.map(res => res.item);
+
+    if (results.length === 0) {
+        container.innerHTML = `<div class="search-no-results">لا توجد نتائج مطابقة أو قريبة لبحثك</div>`;
+        return;
+    }
+
+    container.innerHTML = results.map(r => `
+        <div class="search-result-item" onclick="window.location.href='${r.page}'; closeSearchModal();">
+            <div class="search-result-content-wrap">
+                ${r.image ? `<img src="${r.image}" class="search-result-thumb" alt="${r.title}">` : `<div class="search-result-thumb" style="display:flex;align-items:center;justify-content:center;background:#e2e8f0;font-size:1.1rem;">📁</div>`}
+                <div class="search-result-info">
+                    <span class="search-result-title">${r.title}</span>
+                    <span class="search-result-category">${r.category}</span>
+                </div>
+            </div>
+            <span class="setting-arrow">➔</span>
+        </div>
+    `).join('');
+}
+</script>
+</body>
+</html>
