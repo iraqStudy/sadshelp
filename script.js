@@ -158,34 +158,49 @@ const db = getFirestore(app);
 
     const categoriesList = ['arabic', 'islamic', 'math', 'english', 'biology', 'chemistry', 'physics'];
 
-    // --- مزامنة أصوات الأساتذة بكفاءة عالية (مستمع واحد لمجموعة teachers) ---
+    // --- مزامنة تقييمات الأساتذة (عرض فقط بدون أزرار تفاعلية) ---
     function initFirebaseTeacherListeners() {
-        // تهيئة البيانات الافتراضية محلياً أولاً
         categoriesList.forEach(cat => {
             if (teachersData[cat]) {
                 teachersData[cat].forEach(t => {
-                    t.votes = 0;
-                    t.userVote = localStorage.getItem('voted_' + t.id) === 'true';
+                    t.totalScore = 0;
+                    t.count = 0;
+                    t.average = '0.0';
                 });
             }
         });
 
-        // جلب جميع الأصوات دفعة واحدة ومزامنتها لحظياً
         onSnapshot(collection(db, "teachers"), (snapshot) => {
-            const votesMap = {};
+            const ratingsMap = {};
             snapshot.forEach(docSnap => {
-                votesMap[docSnap.id] = docSnap.data().votes || 0;
+                const data = docSnap.data();
+                ratingsMap[docSnap.id] = {
+                    totalScore: data.totalScore || 0,
+                    count: data.count || 0
+                };
             });
 
             categoriesList.forEach(cat => {
                 if (!teachersData[cat]) return;
                 teachersData[cat].forEach(teacher => {
-                    teacher.votes = votesMap[teacher.id] !== undefined ? votesMap[teacher.id] : 0;
+                    const stats = ratingsMap[teacher.id] || { totalScore: 0, count: 0 };
+                    teacher.totalScore = stats.totalScore;
+                    teacher.count = stats.count;
+                    teacher.average = stats.count > 0 ? (stats.totalScore / stats.count).toFixed(1) : '0.0';
                 });
+
+                // ترتيب الأساتذة بناءً على أعلى متوسط تقييم ثم عدد المقيمين
+                teachersData[cat].sort((a, b) => {
+                    if (parseFloat(b.average) !== parseFloat(a.average)) {
+                        return parseFloat(b.average) - parseFloat(a.average);
+                    }
+                    return b.count - a.count;
+                });
+
                 renderCategoryTeachers(cat);
             });
         }, (error) => {
-            console.error("خطأ في مزامنة أصوات المدرسين:", error);
+            console.error("خطأ في مزامنة تقييمات المدرسين:", error);
         });
     }
 
@@ -193,7 +208,6 @@ const db = getFirestore(app);
         const container = document.getElementById(categoryKey + 'TeachersList') || document.querySelector('#teacher-' + categoryKey + ' .books-list-container');
         if (!container || !teachersData[categoryKey]) return;
 
-        teachersData[categoryKey].sort((a, b) => b.votes - a.votes);
         container.innerHTML = '';
 
         teachersData[categoryKey].forEach((teacher, index) => {
@@ -220,12 +234,7 @@ const db = getFirestore(app);
                     <div class="teacher-main-title">${teacher.name}</div>
                     <div class="teacher-meta-list" style="margin-top: 6px;">
                         <div class="teacher-meta-row"><span>المادة:</span> <strong>${teacher.subject}</strong></div>
-                        <div class="teacher-meta-row"><span>عام التقييم:</span> <strong>2027</strong></div>
-                    </div>
-                    <div class="voting-actions-row" style="margin-top: 10px;">
-                        <button class="vote-btn like-btn ${teacher.userVote ? 'active' : ''}" id="vote-btn-${teacher.id}" onclick="voteTeacher('${teacher.id}')" style="${teacher.userVote ? 'background: #059669;' : ''}">
-                            👍 <span id="vote-text-${teacher.id}">${teacher.userVote ? 'تم التصويت ✓ (إلغاء)' : 'تصويت'}</span> <span class="vote-count" id="votes-count-${teacher.id}">(${teacher.votes})</span>
-                        </button>
+                        <div class="teacher-meta-row"><span>التقييم العام:</span> <strong style="color: #f59e0b;">★ ${teacher.average} (${teacher.count} تقييم)</strong></div>
                     </div>
                 </div>
                 <div class="teacher-avatar-side">
@@ -236,37 +245,7 @@ const db = getFirestore(app);
         });
     }
 
-    window.voteTeacher = async function(teacherId) {
-        let targetTeacher = null;
-        for (let cat of categoriesList) {
-            const found = teachersData[cat].find(t => t.id === teacherId);
-            if (found) {
-                targetTeacher = found;
-                break;
-            }
-        }
-        if (!targetTeacher) return;
-
-        const hasVoted = localStorage.getItem('voted_' + teacherId) === 'true';
-        const teacherRef = doc(db, "teachers", teacherId);
-
-        try {
-            if (hasVoted) {
-                await setDoc(teacherRef, { votes: increment(-1) }, { merge: true });
-                localStorage.removeItem('voted_' + teacherId);
-                targetTeacher.userVote = false;
-            } else {
-                await setDoc(teacherRef, { votes: increment(1) }, { merge: true });
-                localStorage.setItem('voted_' + teacherId, 'true');
-                targetTeacher.userVote = true;
-            }
-        } catch (error) {
-            console.error("خطأ في تحديث التصويت:", error);
-            alert("فشل تحديث الصوت، تحقق من الاتصال بالإنترنت.");
-        }
-    };
-
-    // --- نظام البحث الشامل (مع تصحيح خطأ flexDirection) ---
+    // --- نظام البحث الشامل ---
     const searchIndex = [
         { title: "الأستاذ عقيل الزبيدي", category: "اللغة العربية", image: "https://i.imgur.com/JM08nuw.jpeg", page: "teacher-arabic" },
         { title: "الأستاذ حسين عبيده", category: "اللغة العربية", image: "https://i.imgur.com/ftflwlv.jpeg", page: "teacher-arabic" },
@@ -339,7 +318,6 @@ const db = getFirestore(app);
             return;
         }
 
-        // تم تصحيح flexDirection إلى flex-direction
         container.innerHTML = results.map(r => `
             <div class="search-result-item" onclick="${r.page.endsWith('.html') ? `window.location.href='${r.page}'` : `showPage('${r.page}'); closeSearchModal();`}">
                 <div class="search-result-content-wrap" style="display: flex; align-items: center; gap: 12px;">
